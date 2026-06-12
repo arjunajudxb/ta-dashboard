@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;font-size:14px;display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;min-width:220px;background:#0d1120;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;transition:width .25s}
+.sidebar.collapsed{width:60px;min-width:60px}
+.sidebar-header{padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px}
+.sidebar-logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#4ade9a,#2563eb);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+.sidebar-brand{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;opacity:1;transition:opacity .2s}
+.sidebar.collapsed .sidebar-brand,.sidebar.collapsed .sidebar-sub{opacity:0;width:0}
+.sidebar-sub{font-size:10px;color:#4b5563;white-space:nowrap;overflow:hidden}
+.nav{flex:1;padding:12px 8px;overflow-y:auto}
+.nav-section{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#374151;padding:8px 8px 4px;white-space:nowrap;transition:opacity .2s}
+.sidebar.collapsed .nav-section{opacity:0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;transition:background .15s;position:relative}
+.nav-item:hover{background:rgba(255,255,255,.05)}
+.nav-item.active{background:rgba(74,222,154,.1);border:1px solid rgba(74,222,154,.2)}
+.nav-icon{width:18px;height:18px;flex-shrink:0;opacity:.6;display:flex;align-items:center;justify-content:center}
+.nav-item.active .nav-icon{opacity:1}
+.nav-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8}
+.nav-item.active .nav-icon svg{stroke:#4ade9a}
+.nav-label{font-size:13px;color:#9ca3af;white-space:nowrap;overflow:hidden;transition:opacity .2s}
+.nav-item.active .nav-label{color:#4ade9a;font-weight:600}
+.sidebar.collapsed .nav-label,.sidebar.collapsed .nav-badge{opacity:0;width:0}
+.nav-badge{margin-left:auto;background:rgba(248,113,113,.2);color:#f87171;font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;flex-shrink:0;transition:opacity .2s}
+.sidebar-footer{padding:12px 8px;border-top:1px solid rgba(255,255,255,.06)}
+.collapse-btn{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;color:#6b7280;font-size:12px;transition:background .15s}
+.collapse-btn:hover{background:rgba(255,255,255,.05)}
+.collapse-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0;transition:transform .3s}
+.sidebar.collapsed .collapse-btn svg{transform:rotate(180deg)}
+.collapse-label{white-space:nowrap;overflow:hidden;transition:opacity .2s}
+.sidebar.collapsed .collapse-label{opacity:0;width:0}
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.topbar{padding:14px 28px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;background:#0a0e1a;position:sticky;top:0;z-index:10}
+.topbar-title{font-size:16px;font-weight:600;color:#fff}
+.topbar-meta{font-size:12px;color:#4b5563}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#4ade9a;box-shadow:0 0 6px #4ade9a;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.live-label{font-size:11px;color:#4ade9a;font-weight:600;letter-spacing:.06em}
+.refresh-btn{padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#9ca3af;font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
+.refresh-btn:hover{border-color:#4ade9a;color:#4ade9a}
+.content{padding:24px 28px;flex:1}
+.page{display:none}.page.active{display:block}
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;gap:12px;color:#6b7280}
+.spinner{width:32px;height:32px;border:2px solid rgba(255,255,255,.08);border-top-color:#4ade9a;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-box{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:12px;padding:16px 20px;color:#f87171;font-size:13px}
+.metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:24px}
+.mcard{background:#111827;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden}
+.mcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:12px 12px 0 0}
+.mcard.c-blue::before{background:#60a5fa}.mcard.c-red::before{background:#f87171}
+.mcard.c-green::before{background:#4ade9a}.mcard.c-amber::before{background:#fbbf24}
+.mcard.c-teal::before{background:#2dd4bf}.mcard.c-purple::before{background:#a78bfa}
+.mcard-label{font-size:10px;color:#6b7280;font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
+.mcard-value{font-size:28px;font-weight:700;line-height:1;color:#fff}
+.mcard-value.warn{color:#f87171}.mcard-value.ok{color:#4ade9a}
+.mcard-sub{font-size:10px;color:#4b5563;margin-top:4px}
+.type-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.tcard{background:#1a2744;border:1px solid rgba(96,165,250,.2);border-radius:12px;padding:14px 16px}
+.tcard-label{font-size:11px;color:#93c5fd;font-weight:500;margin-bottom:6px}
+.tcard-value{font-size:26px;font-weight:700;color:#fff}
+.section-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#4b5563;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.05)}
+.charts-3{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:12px;margin-bottom:20px}
+.charts-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.card{background:#111827;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px 18px}
+.card h3{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6b7280;margin-bottom:12px}
+.chart-wrap{position:relative;width:100%}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;align-items:center}
+.filter-select{background:#111827;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#9ca3af;padding:7px 12px;font-size:12px;font-family:inherit;cursor:pointer;outline:none;min-width:150px}
+.filter-select:hover{border-color:rgba(255,255,255,.2)}
+.chip-group{display:flex;gap:5px;flex-wrap:wrap}
+.chip{padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:transparent;cursor:pointer;font-size:11px;color:#9ca3af;transition:all .15s;font-weight:500}
+.chip.active{background:rgba(74,222,154,.12);border-color:#4ade9a;color:#4ade9a}
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;padding:8px 10px;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#4b5563;border-bottom:1px solid rgba(255,255,255,.07);white-space:nowrap}
+.tbl td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:#d1d5db;white-space:nowrap}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+.td-pos{font-weight:600;color:#e5e7eb;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+.days-cell{display:inline-block;padding:2px 8px;border-radius:6px;font-weight:700;font-size:12px;min-width:36px;text-align:center}
+.days-red{background:rgba(248,113,113,.25);color:#fca5a5}
+.days-amber{background:rgba(251,191,36,.2);color:#fde68a}
+.days-green{background:rgba(74,222,154,.15);color:#6ee7b7}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.badge-red{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.2)}
+.badge-green{background:rgba(74,222,154,.12);color:#4ade9a;border:1px solid rgba(74,222,154,.18)}
+.badge-amber{background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.18)}
+.badge-blue{background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.18)}
+.rec-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.rec-card{background:#111827;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px 20px}
+.rec-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-bottom:12px}
+.rec-name{font-size:15px;font-weight:600;color:#fff;margin-bottom:2px}
+.rec-meta{font-size:11px;color:#6b7280;margin-bottom:14px}
+.rec-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.rec-stat{background:#0d1120;border-radius:8px;padding:10px 8px;text-align:center}
+.rec-stat-val{font-size:18px;font-weight:700;color:#fff}
+.rec-stat-lab{font-size:10px;color:#6b7280;margin-top:2px}
+.sla-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.sla-row:last-child{border-bottom:none}
+.sla-pos{flex:1;font-size:12px;font-weight:500;color:#e5e7eb;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sla-rec{font-size:11px;color:#6b7280;min-width:48px}
+.sla-num{font-size:13px;font-weight:700;min-width:30px;text-align:right}
+.sla-bar{flex:1;max-width:80px;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
+.sla-fill{height:100%;border-radius:2px}
+.last-updated{font-size:10px;color:#374151;margin-left:8px}
+</style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">MT</div>
+    <div>
+      <div class="sidebar-brand">MoonTech TA</div>
+      <div class="sidebar-sub">MXIN Holdings</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Reports</div>
+    <div class="nav-item active" data-page="overview" onclick="goPage('overview',this)">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+      <span class="nav-label">Top Level</span>
+    </div>
+    <div class="nav-item" data-page="pipeline" onclick="goPage('pipeline',this)">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></div>
+      <span class="nav-label">Pipeline Health</span>
+      <span class="nav-badge" id="sla-badge">—</span>
+    </div>
+    <div class="nav-item" data-page="capacity" onclick="goPage('capacity',this)">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><line x1="16" y1="11" x2="22" y2="11"/><line x1="19" y1="8" x2="19" y2="14"/></svg></div>
+      <span class="nav-label">Team Capacity</span>
+    </div>
+    <div class="nav-item" data-page="monday" onclick="goPage('monday',this)">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+      <span class="nav-label">Monday Review</span>
+    </div>
+    <div class="nav-section" style="margin-top:12px">Filters</div>
+    <div style="padding:4px 4px 0">
+      <select class="filter-select" id="globalCompany" style="width:100%;margin-bottom:6px" onchange="applyGlobal()">
+        <option value="All">All companies</option>
+        <option value="MoonTech">MoonTech</option>
+        <option value="ITCAN">ITCAN</option>
+      </select>
+      <select class="filter-select" id="globalRecruiter" style="width:100%;margin-bottom:6px" onchange="applyGlobal()">
+        <option value="All">All recruiters</option>
+        <option value="Nour J">Nour J</option>
+        <option value="Nour M">Nour M</option>
+        <option value="Aju">Aju</option>
+      </select>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="collapse-btn" onclick="toggleSidebar()">
+      <svg viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+      <span class="collapse-label">Collapse</span>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="topbar-title">Top Level Overview</div>
+      <div class="topbar-meta">ITCAN & MoonTech · <span id="lastUpdated">Loading...</span></div>
+    </div>
+    <div class="topbar-right">
+      <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
+      <div class="live-dot"></div>
+      <div class="live-label">LIVE</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div id="globalLoading" class="loading">
+      <div class="spinner"></div>
+      <div>Fetching live data from Google Sheets...</div>
+    </div>
+    <div id="globalError" style="display:none;padding:20px">
+      <div class="error-box" id="errorMsg"></div>
+    </div>
+    <div id="allPages" style="display:none">
+
+      <!-- PAGE 1: OVERVIEW -->
+      <div class="page active" id="page-overview">
+        <div class="metrics" id="metricsRow"></div>
+        <div class="type-cards" id="typeCards"></div>
+        <div class="section-label">Pipeline breakdown</div>
+        <div class="charts-3">
+          <div class="card"><h3>Status breakdown</h3><div class="chart-wrap" style="height:190px"><canvas id="cStatus" role="img" aria-label="Status">Status</canvas></div></div>
+          <div class="card"><h3>Role type mix</h3><div class="chart-wrap" style="height:190px"><canvas id="cRoleType" role="img" aria-label="Role type">Role type</canvas></div></div>
+          <div class="card"><h3>Priority distribution</h3><div class="chart-wrap" style="height:190px"><canvas id="cPriority" role="img" aria-label="Priority">Priority</canvas></div></div>
+        </div>
+      </div>
+
+      <!-- PAGE 2: PIPELINE HEALTH -->
+      <div class="page" id="page-pipeline">
+        <div class="filters">
+          <select class="filter-select" id="pfStatus" onchange="renderPipeline()">
+            <option value="Open" selected>Open only</option>
+            <option value="All">All statuses</option>
+            <option value="Closed">Closed</option>
+            <option value="Paused">Paused</option>
+          </select>
+          <select class="filter-select" id="pfRoleType" onchange="renderPipeline()">
+            <option value="All">All role types</option>
+            <option value="Full Time">Full Time</option>
+            <option value="Part Time">Part Time</option>
+            <option value="Advisor">Advisor</option>
+          </select>
+          <div class="chip-group" id="overSlaChips">
+            <span class="chip active" data-ov="All" onclick="setOvFilter(this,'All')">All</span>
+            <span class="chip" data-ov="Yes" onclick="setOvFilter(this,'Yes')">Over SLA only</span>
+            <span class="chip" data-ov="No" onclick="setOvFilter(this,'No')">Within SLA</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Pipeline health table</h3>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>#</th><th>Position</th><th>Company</th><th>Recruiter</th><th>Stage</th><th>Days open</th><th>SLA days</th><th>Days over SLA</th><th>Over SLA</th><th>Hiring manager</th><th>Role type</th><th>Position type</th><th>Budget AED</th><th>Category</th></tr></thead>
+              <tbody id="pipelineTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 3: TEAM CAPACITY -->
+      <div class="page" id="page-capacity">
+        <div class="rec-cards" id="recCards"></div>
+        <div class="charts-2">
+          <div class="card"><h3>Open vs over-SLA per recruiter</h3><div class="chart-wrap" style="height:200px"><canvas id="cCapacity" role="img" aria-label="Capacity">Capacity</canvas></div></div>
+          <div class="card"><h3>Avg days open per recruiter</h3><div class="chart-wrap" style="height:200px"><canvas id="cAvgDays" role="img" aria-label="Avg days">Avg days</canvas></div></div>
+        </div>
+        <div class="section-label">SLA health — open roles</div>
+        <div class="card"><h3>Top 10 by urgency</h3><div id="slaRows"></div></div>
+      </div>
+
+      <!-- PAGE 4: MONDAY REVIEW -->
+      <div class="page" id="page-monday">
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px" id="monMetrics"></div>
+        <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:14px;margin-bottom:20px">
+          <div class="card">
+            <h3>At-risk roles — over SLA</h3>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead><tr><th>#</th><th>Position</th><th>Company</th><th>Recruiter</th><th>Days open</th><th>Days over SLA</th><th>Hiring manager</th></tr></thead>
+                <tbody id="atRiskTbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card"><h3>Closed this week (≤7 days to fill)</h3><div class="chart-wrap" style="height:240px"><canvas id="cClosedWeek" role="img" aria-label="Closed this week">Closed</canvas></div></div>
+        </div>
+        <div class="section-label">Historical benchmarks</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+          <div class="card"><h3>Avg time to fill — monthly (days)</h3><div class="chart-wrap" style="height:220px"><canvas id="cTtf" role="img" aria-label="TTF trend">TTF</canvas></div></div>
+          <div class="card"><h3>Monthly pipeline movement</h3><div class="chart-wrap" style="height:220px"><canvas id="cMovement" role="img" aria-label="Pipeline movement">Movement</canvas></div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+          <div class="card"><h3>Closing rate by role type</h3><div class="chart-wrap" style="height:220px"><canvas id="cClosingRole" role="img" aria-label="Closing by role type">Closing</canvas></div></div>
+          <div class="card"><h3>Roles opened vs closed by month</h3><div class="chart-wrap" style="height:220px"><canvas id="cOpenedVsClosed" role="img" aria-label="Opened vs closed">Opened vs closed</canvas></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+Chart.defaults.color='#6b7280';
+Chart.defaults.borderColor='rgba(255,255,255,0.05)';
+
+const API_URL = 'https://script.google.com/macros/s/AKfycbxzs7qdrJK93WwHBKnQ2RN8aWcr9-EbAmSIYitoEiUQAiMu2sSRw6hIDhrWsTDgUz3X6A/exec';
+
+let RAW = [];
+let gFilters = {company:"All", recruiter:"All"};
+let pFilters = {status:"Open", roleType:"All", overSla:"All"};
+let ci = {};
+const Gg = {grid:{color:'rgba(255,255,255,0.05)'},ticks:{font:{size:11},color:'#6b7280'}};
+
+async function loadData(){
+  document.getElementById('globalLoading').style.display='flex';
+  document.getElementById('globalError').style.display='none';
+  document.getElementById('allPages').style.display='none';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:8000,
+        messages:[{
+          role:'user',
+          content:`Make a GET request to this URL and return ONLY the raw JSON array response, nothing else: ${API_URL}`
+        }],
+        tools:[{type:'web_search_20250305',name:'web_search'}]
+      })
+    });
+    const data = await res.json();
+    if(data.type==='error') throw new Error(data.error?.message||'API error');
+
+    // Find text content in response
+    let text='';
+    for(const b of data.content||[]){
+      if(b.type==='text') text+=b.text;
+    }
+
+    // Extract JSON array from the text
+    const match = text.match(/\[[\s\S]*\]/);
+    if(!match) throw new Error('No JSON array found in response');
+    const rows = JSON.parse(match[0]);
+    if(!Array.isArray(rows)||rows.length===0) throw new Error('Empty or invalid data');
+    parseRows(rows);
+  } catch(e){
+    showError('Error: '+e.message);
+  }
+}
+
+function parseRows(rows){
+  RAW = rows.map(r=>{
+    const daysOpen = parseInt(r['Days_Open'])||0;
+    const slaDays  = parseInt(r['SLA_Days'])||45;
+    const budget   = parseInt((String(r['Budget_AED']||'')).replace(/[^0-9]/g,''))||0;
+    const status   = String(r['Status']||'').trim();
+    const recruiter= String(r['Recruiter']||'').trim();
+    const rec = recruiter.toLowerCase().includes('jabaseh')||recruiter.toLowerCase().includes('nour j') ? 'Nour J'
+              : recruiter.toLowerCase().includes('mokhtar')||recruiter.toLowerCase().includes('nour m') ? 'Nour M'
+              : recruiter.toLowerCase().includes('aju') ? 'Aju'
+              : recruiter||'Other';
+    const statusNorm = status.toLowerCase().includes('open') ? 'Open'
+                     : status.toLowerCase().includes('closed') ? 'Closed'
+                     : (status.toLowerCase().includes('pause')||status.toLowerCase().includes('cancel')||status.toLowerCase().includes('direction')) ? 'Paused'
+                     : status||'Other';
+    return {
+      pos:      String(r['Position']||'').trim(),
+      company:  String(r['Company']||'').trim(),
+      recruiter: rec,
+      status:   statusNorm,
+      roleType: String(r['Role_Type']||r['Position_Type']||'Full Time').trim(),
+      posType:  String(r['Position_Type']||'').trim(),
+      days:     daysOpen,
+      sla:      slaDays,
+      stage:    String(r['Stage']||'').trim(),
+      budget:   budget,
+      cat:      String(r['Budget category']||r['Budget_category']||'').trim(),
+      priority: String(r['Priority']||'').trim(),
+      hm:       String(r['Hiring_Manager']||'').trim(),
+      daysOverSla: parseInt(r['Days_Over_SLA'])||0,
+      openDate:   String(r['Open_Date']||'').trim(),
+      closedDate: String(r['Closed_Date']||'').trim(),
+    };
+  }).filter(r=>r.pos);
+
+  document.getElementById('globalLoading').style.display='none';
+  document.getElementById('allPages').style.display='block';
+  document.getElementById('lastUpdated').textContent='Live · Updated '+new Date().toLocaleTimeString();
+  renderAll();
+}
+
+function showError(msg){
+  document.getElementById('globalLoading').style.display='none';
+  document.getElementById('globalError').style.display='block';
+  document.getElementById('errorMsg').textContent = msg;
+}
+
+function getFiltered(){
+  return RAW.filter(r=>{
+    if(gFilters.company!=='All'&&r.company!==gFilters.company) return false;
+    if(gFilters.recruiter!=='All'&&r.recruiter!==gFilters.recruiter) return false;
+    return true;
+  });
+}
+function getPipeline(){
+  return getFiltered().filter(r=>{
+    if(pFilters.status!=='All'&&r.status!==pFilters.status) return false;
+    if(pFilters.roleType!=='All'&&r.roleType!==pFilters.roleType) return false;
+    if(pFilters.overSla==='Yes'&&!over(r)) return false;
+    if(pFilters.overSla==='No'&&over(r)>0) return false;
+    return true;
+  });
+}
+function over(r){return Math.max(0, r.daysOverSla||Math.max(0,r.days-r.sla));}
+
+function applyGlobal(){
+  gFilters.company=document.getElementById('globalCompany').value;
+  gFilters.recruiter=document.getElementById('globalRecruiter').value;
+  renderAll();
+}
+
+function renderAll(){
+  renderOverview();
+  renderPipeline();
+  renderCapacity();
+  renderMonday();
+  updateSlaBadge();
+}
+
+function updateSlaBadge(){
+  const n=getFiltered().filter(r=>r.status==='Open'&&over(r)>0).length;
+  document.getElementById('sla-badge').textContent=n;
+}
+
+function mk(id,config){
+  if(ci[id])ci[id].destroy();
+  const el=document.getElementById(id);
+  if(!el)return;
+  ci[id]=new Chart(el,config);
+}
+
+/* ── PAGE 1: OVERVIEW ── */
+function renderOverview(){
+  const d=getFiltered();
+  const open=d.filter(r=>r.status==='Open');
+  const closed=d.filter(r=>r.status==='Closed');
+  const paused=d.filter(r=>r.status==='Paused');
+  const overSlaR=open.filter(r=>over(r)>0);
+  const avgClose=closed.length?Math.round(closed.reduce((s,r)=>s+r.days,0)/closed.length):0;
+  const avgOpen=open.length?Math.round(open.reduce((s,r)=>s+r.days,0)/open.length):0;
+  const rate=d.length?Math.round(closed.length/d.length*100):0;
+  const closedM=closed.filter(r=>r.days<=30).length;
+
+  document.getElementById('metricsRow').innerHTML=`
+    <div class="mcard c-blue"><div class="mcard-label">Open positions</div><div class="mcard-value">${open.length}</div><div class="mcard-sub">Active pipeline</div></div>
+    <div class="mcard c-red"><div class="mcard-label">Roles over SLA</div><div class="mcard-value warn">${overSlaR.length}</div><div class="mcard-sub">${open.length?Math.round(overSlaR.length/open.length*100):0}% of open</div></div>
+    <div class="mcard c-green"><div class="mcard-label">Closed this month</div><div class="mcard-value ok">${closedM}</div><div class="mcard-sub">≤ 30 days</div></div>
+    <div class="mcard c-amber"><div class="mcard-label">Avg days to close</div><div class="mcard-value">${avgClose}</div><div class="mcard-sub">Target: 45 days</div></div>
+    <div class="mcard c-teal"><div class="mcard-label">Avg days open</div><div class="mcard-value">${avgOpen}</div><div class="mcard-sub">Current open roles</div></div>
+    <div class="mcard c-purple"><div class="mcard-label">Paused / on hold</div><div class="mcard-value">${paused.length}</div><div class="mcard-sub">${rate}% closing rate</div></div>`;
+
+  const ftO=open.filter(r=>r.roleType==='Full Time').length;
+  const frO=open.filter(r=>r.roleType==='Fractional').length;
+  const adO=open.filter(r=>r.roleType==='Advisor').length;
+  const ptO=open.filter(r=>r.roleType==='Part Time').length;
+  document.getElementById('typeCards').innerHTML=`
+    <div class="tcard"><div class="tcard-label">Open — Full Time</div><div class="tcard-value">${ftO}</div></div>
+    <div class="tcard"><div class="tcard-label">Open — Fractional</div><div class="tcard-value">${frO}</div></div>
+    <div class="tcard"><div class="tcard-label">Open — Advisor</div><div class="tcard-value">${adO}</div></div>
+    <div class="tcard"><div class="tcard-label">Open — Part Time</div><div class="tcard-value">${ptO}</div></div>`;
+
+  mk('cStatus',{type:'bar',data:{labels:['Open','Closed','Paused'],datasets:[{data:[open.length,closed.length,paused.length],backgroundColor:['#60a5fa','#4ade9a','#fbbf24'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:Gg.grid,ticks:Gg.ticks},x:{grid:{display:false},ticks:Gg.ticks}}}});
+
+  const types=['Full Time','Part Time','Advisor','Fractional'];
+  mk('cRoleType',{type:'doughnut',data:{labels:types,datasets:[{data:types.map(t=>d.filter(r=>r.roleType===t).length),backgroundColor:['#60a5fa','#4ade9a','#fbbf24','#a78bfa'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'bottom',labels:{font:{size:10},color:'#9ca3af',padding:8,usePointStyle:true,pointStyle:'rect'}}}}});
+
+  const levels=['Urgent','High','Medium','Pause'];
+  mk('cPriority',{type:'bar',data:{labels:levels,datasets:[{data:levels.map(l=>d.filter(r=>r.priority===l).length),backgroundColor:['#f87171','#fbbf24','#60a5fa','#6b7280'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:Gg.grid,ticks:Gg.ticks},x:{grid:{display:false},ticks:Gg.ticks}}}});
+}
+
+/* ── PAGE 2: PIPELINE ── */
+function renderPipeline(){
+  const d=getPipeline().sort((a,b)=>over(b)-over(a));
+  document.getElementById('pipelineTbody').innerHTML=d.map((r,i)=>{
+    const o=over(r);
+    const cls=o>30?'days-red':o>0?'days-amber':'days-green';
+    const ob=o>0?`<span class="badge badge-red">Yes</span>`:`<span class="badge badge-green">No</span>`;
+    return`<tr><td style="color:#4b5563">${i+1}</td><td class="td-pos">${r.pos}</td><td>${r.company}</td><td>${r.recruiter}</td><td style="color:#9ca3af;max-width:130px;overflow:hidden;text-overflow:ellipsis">${r.stage}</td><td style="font-weight:600">${r.days}</td><td style="color:#6b7280">${r.sla}</td><td><span class="days-cell ${cls}">${o}</span></td><td>${ob}</td><td>${r.hm}</td><td>${r.roleType}</td><td>${r.posType}</td><td style="color:#9ca3af">${r.budget>0?r.budget.toLocaleString():'—'}</td><td style="font-size:11px;color:#6b7280">${r.cat}</td></tr>`;
+  }).join('');
+}
+
+/* ── PAGE 3: CAPACITY ── */
+function renderCapacity(){
+  const d=getFiltered();
+  const recs=['Nour J','Nour M','Aju'];
+  const colors=['#60a5fa','#4ade9a','#a78bfa'];
+  document.getElementById('recCards').innerHTML=recs.map((r,i)=>{
+    const all=d.filter(x=>x.recruiter===r);
+    const open=all.filter(x=>x.status==='Open');
+    const closed=all.filter(x=>x.status==='Closed');
+    const overC=open.filter(x=>over(x)>0);
+    return`<div class="rec-card"><div class="rec-avatar" style="background:${colors[i]}22;color:${colors[i]}">${r.split(' ').map(w=>w[0]).join('')}</div><div class="rec-name">${r}</div><div class="rec-meta">Recruiter · MoonTech TA</div><div class="rec-stats"><div class="rec-stat"><div class="rec-stat-val" style="color:${colors[i]}">${open.length}</div><div class="rec-stat-lab">Open</div></div><div class="rec-stat"><div class="rec-stat-val" style="color:#4ade9a">${closed.length}</div><div class="rec-stat-lab">Closed</div></div><div class="rec-stat"><div class="rec-stat-val" style="color:#f87171">${overC.length}</div><div class="rec-stat-lab">Over SLA</div></div></div></div>`;
+  }).join('');
+  const openC=recs.map(r=>d.filter(x=>x.recruiter===r&&x.status==='Open').length);
+  const overC=recs.map(r=>d.filter(x=>x.recruiter===r&&x.status==='Open'&&over(x)>0).length);
+  mk('cCapacity',{type:'bar',data:{labels:recs,datasets:[{label:'Open',data:openC,backgroundColor:'#60a5fa',borderRadius:4,borderSkipped:false},{label:'Over SLA',data:overC,backgroundColor:'#f87171',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:Gg.ticks},y:{grid:Gg.grid,ticks:{...Gg.ticks,stepSize:1}}}}});
+  const avgs=recs.map(r=>{const rs=d.filter(x=>x.recruiter===r);return rs.length?Math.round(rs.reduce((s,x)=>s+x.days,0)/rs.length):0;});
+  mk('cAvgDays',{type:'bar',data:{labels:recs,datasets:[{data:avgs,backgroundColor:avgs.map(v=>v>60?'#f87171':v>45?'#fbbf24':'#4ade9a'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:Gg.grid,ticks:Gg.ticks},y:{grid:{display:false},ticks:Gg.ticks}}}});
+  const openRoles=d.filter(r=>r.status==='Open').sort((a,b)=>over(b)-over(a)).slice(0,10);
+  document.getElementById('slaRows').innerHTML=openRoles.map(r=>{
+    const o=over(r),fill=o>30?'#f87171':o>0?'#fbbf24':'#4ade9a';
+    const pct=Math.min(100,Math.round(r.days/r.sla*100));
+    return`<div class="sla-row"><div class="sla-pos">${r.pos}</div><div class="sla-rec">${r.recruiter}</div><div class="sla-num" style="color:${fill}">${r.days}</div><div class="sla-bar"><div class="sla-fill" style="width:${pct}%;background:${fill}"></div></div>${o>0?`<span class="badge badge-red">+${o}d</span>`:`<span class="badge badge-green">OK</span>`}</div>`;
+  }).join('');
+}
+
+/* ── PAGE 4: MONDAY REVIEW ── */
+function renderMonday(){
+  const d=getFiltered();
+  const open=d.filter(r=>r.status==='Open');
+  const paused=d.filter(r=>r.status==='Paused');
+  const closed=d.filter(r=>r.status==='Closed');
+  const overSlaR=open.filter(r=>over(r)>0);
+  const avgFill=closed.length?(closed.reduce((s,r)=>s+r.days,0)/closed.length).toFixed(1):'—';
+  const closedM=closed.filter(r=>r.days<=30).length;
+  document.getElementById('monMetrics').innerHTML=`
+    <div class="mcard c-blue"><div class="mcard-label">Open positions</div><div class="mcard-value">${open.length}</div><div class="mcard-sub">Active pipeline</div></div>
+    <div class="mcard c-purple"><div class="mcard-label">Paused / on hold</div><div class="mcard-value">${paused.length}</div><div class="mcard-sub">Direction change/hold</div></div>
+    <div class="mcard c-red"><div class="mcard-label">Roles over SLA</div><div class="mcard-value warn">${overSlaR.length}</div><div class="mcard-sub">${open.length?Math.round(overSlaR.length/open.length*100):0}% of open</div></div>
+    <div class="mcard c-green"><div class="mcard-label">Closed this month</div><div class="mcard-value ok">${closedM}</div><div class="mcard-sub">≤ 30 days</div></div>
+    <div class="mcard c-amber"><div class="mcard-label">Avg days to fill</div><div class="mcard-value">${avgFill}</div><div class="mcard-sub">Closed roles only</div></div>`;
+
+  const atRisk=[...open.filter(r=>over(r)>0)].sort((a,b)=>over(b)-over(a));
+  document.getElementById('atRiskTbody').innerHTML=atRisk.map((r,i)=>{
+    const o=over(r),cls=o>50?'days-red':o>25?'days-amber':'days-green';
+    return`<tr><td style="color:#4b5563">${i+1}</td><td class="td-pos">${r.pos}</td><td>${r.company}</td><td>${r.recruiter}</td><td style="font-weight:600">${r.days}</td><td><span class="days-cell ${cls}">${o}</span></td><td>${r.hm}</td></tr>`;
+  }).join('');
+
+  const recentClosed=closed.filter(r=>r.days<=30);
+  mk('cClosedWeek',{type:'bar',data:{labels:recentClosed.length?recentClosed.map(r=>r.pos.length>16?r.pos.slice(0,16)+'…':r.pos):['No recent closures'],datasets:[{data:recentClosed.length?recentClosed.map(r=>r.days):[0],backgroundColor:'#2dd4bf',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:Gg.grid,ticks:Gg.ticks,title:{display:true,text:'Days to fill',color:'#6b7280',font:{size:10}}},x:{grid:{display:false},ticks:{...Gg.ticks,maxRotation:35}}}}});
+
+  // Build monthly data dynamically from live rows
+  const months=['January','February','March','April','May','June'];
+  const monthNums={'jan':0,'feb':1,'mar':2,'apr':3,'may':4,'jun':5};
+  function getMonth(dateStr){
+    if(!dateStr)return -1;
+    const m=dateStr.toLowerCase();
+    for(const[k,v] of Object.entries(monthNums)){if(m.includes(k))return v;}
+    const d=new Date(dateStr);
+    if(!isNaN(d))return d.getMonth()<6?d.getMonth():-1;
+    return -1;
+  }
+  const mClosed=months.map((_,i)=>closed.filter(r=>getMonth(r.closedDate)===i).length);
+  const mOpened=months.map((_,i)=>d.filter(r=>getMonth(r.openDate)===i).length);
+  const mPaused=months.map((_,i)=>paused.filter(r=>getMonth(r.openDate)===i).length);
+  const mTtf=months.map((_,i)=>{const rs=closed.filter(r=>getMonth(r.closedDate)===i);return rs.length?Math.round(rs.reduce((s,r)=>s+r.days,0)/rs.length):null;});
+
+  mk('cTtf',{type:'line',data:{labels:months,datasets:[{label:'Avg TTF',data:mTtf,borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,0.08)',tension:.35,pointRadius:4,pointBackgroundColor:'#60a5fa',fill:true,spanGaps:true},{label:'SLA Target (45)',data:months.map(()=>45),borderColor:'#f87171',borderDash:[6,4],pointRadius:0,borderWidth:1.5,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},color:'#9ca3af',usePointStyle:true,pointStyle:'circle'}}},scales:{y:{grid:Gg.grid,ticks:Gg.ticks,min:0},x:{grid:{display:false},ticks:Gg.ticks}}}});
+
+  mk('cMovement',{type:'line',data:{labels:months,datasets:[{label:'Roles opened',data:mOpened,borderColor:'#a78bfa',tension:.35,pointRadius:4,pointBackgroundColor:'#a78bfa',fill:false},{label:'Roles closed',data:mClosed,borderColor:'#4ade9a',tension:.35,pointRadius:4,pointBackgroundColor:'#4ade9a',fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},color:'#9ca3af',usePointStyle:true,pointStyle:'circle'}}},scales:{y:{grid:Gg.grid,ticks:{...Gg.ticks,stepSize:2}},x:{grid:{display:false},ticks:Gg.ticks}}}});
+
+  const types=['Full Time','Part Time','Advisor','Fractional'];
+  mk('cClosingRole',{type:'bar',data:{labels:types,datasets:[{label:'Closed',data:types.map(t=>closed.filter(r=>r.roleType===t).length),backgroundColor:'#0d9488',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:Gg.grid,ticks:Gg.ticks},x:{grid:{display:false},ticks:Gg.ticks}}}});
+
+  mk('cOpenedVsClosed',{type:'bar',data:{labels:months,datasets:[{label:'Closed',data:mClosed,backgroundColor:'#ec4899',borderRadius:4,borderSkipped:false},{label:'Paused',data:mPaused,backgroundColor:'#0e7490',borderRadius:4,borderSkipped:false},{label:'Opened',data:mOpened,backgroundColor:'#38bdf8',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},color:'#9ca3af',usePointStyle:true,pointStyle:'rect'}}},scales:{x:{grouped:true,grid:{display:false},ticks:Gg.ticks},y:{grid:Gg.grid,ticks:Gg.ticks}}}});
+}
+
+function goPage(name,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  el.classList.add('active');
+  const titles={overview:'Top Level Overview',pipeline:'Pipeline Health',capacity:'Team Capacity',monday:'Monday Review'};
+  document.getElementById('topbar-title').textContent=titles[name];
+  setTimeout(()=>{Object.values(ci).forEach(c=>{try{c.resize()}catch(e){}})},50);
+}
+function setOvFilter(el,val){
+  document.querySelectorAll('#overSlaChips .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');pFilters.overSla=val;renderPipeline();
+}
+document.getElementById('pfStatus').addEventListener('change',function(){pFilters.status=this.value;renderPipeline();});
+document.getElementById('pfRoleType').addEventListener('change',function(){pFilters.roleType=this.value;renderPipeline();});
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('collapsed');
+  setTimeout(()=>{Object.values(ci).forEach(c=>{try{c.resize()}catch(e){}})},300);
+}
+
+// Auto-refresh every 5 minutes
+setInterval(loadData, 5*60*1000);
+loadData();
+</script>
+</body>
+</html>
