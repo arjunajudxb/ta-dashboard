@@ -8,116 +8,118 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;font-size:14px;display:flex;height:100vh;overflow:hidden}
-.sidebar{width:220px;min-width:220px;background:#0d1120;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;transition:width .25s}
+.sidebar{width:220px;min-width:220px;background:#0d1120;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;transition:width .25s;overflow:hidden}
 .sidebar.collapsed{width:60px;min-width:60px}
-.sidebar-header{padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px}
-.sidebar-logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#4ade9a,#2563eb);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
-.sidebar-brand{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden}
-.sidebar.collapsed .sidebar-brand,.sidebar.collapsed .sidebar-sub{opacity:0;width:0}
-.sidebar-sub{font-size:10px;color:#4b5563;white-space:nowrap}
-.nav{flex:1;padding:12px 8px;overflow-y:auto}
-.nav-section{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#374151;padding:8px 8px 4px;white-space:nowrap}
-.sidebar.collapsed .nav-section{opacity:0}
+.sb-header{padding:18px 14px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px}
+.sb-logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#4ade9a,#2563eb);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+.sb-brand{font-size:13px;font-weight:700;color:#fff;white-space:nowrap}
+.sidebar.collapsed .sb-brand,.sidebar.collapsed .sb-sub,.sidebar.collapsed .nav-label,.sidebar.collapsed .nav-badge,.sidebar.collapsed .sb-sec,.sidebar.collapsed .sb-filters{opacity:0;pointer-events:none}
+.sb-sub{font-size:10px;color:#4b5563;white-space:nowrap}
+.nav{flex:1;padding:10px 8px;overflow-y:auto}
+.sb-sec{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#374151;padding:8px 8px 4px;white-space:nowrap}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;transition:background .15s}
 .nav-item:hover{background:rgba(255,255,255,.05)}
 .nav-item.active{background:rgba(74,222,154,.1);border:1px solid rgba(74,222,154,.2)}
-.nav-icon{width:18px;height:18px;flex-shrink:0;opacity:.6;display:flex;align-items:center;justify-content:center}
+.nav-icon{width:18px;height:18px;flex-shrink:0;opacity:.55;display:flex;align-items:center;justify-content:center}
 .nav-item.active .nav-icon{opacity:1}
 .nav-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8}
 .nav-item.active .nav-icon svg{stroke:#4ade9a}
-.nav-label{font-size:13px;color:#9ca3af;white-space:nowrap;overflow:hidden;transition:opacity .2s}
+.nav-label{font-size:13px;color:#9ca3af;white-space:nowrap}
 .nav-item.active .nav-label{color:#4ade9a;font-weight:600}
-.sidebar.collapsed .nav-label,.sidebar.collapsed .nav-badge{opacity:0;width:0}
 .nav-badge{margin-left:auto;background:rgba(248,113,113,.2);color:#f87171;font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;flex-shrink:0}
-.sidebar-footer{padding:12px 8px;border-top:1px solid rgba(255,255,255,.06)}
-.collapse-btn{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;color:#6b7280;font-size:12px}
-.collapse-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0;transition:transform .3s}
-.sidebar.collapsed .collapse-btn svg{transform:rotate(180deg)}
-.collapse-label{white-space:nowrap;transition:opacity .2s}
-.sidebar.collapsed .collapse-label{opacity:0;width:0}
-.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.sb-filters{padding:0 8px 8px}
+.flt-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#374151;margin:10px 0 4px}
+.fsel{width:100%;background:#111827;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#9ca3af;padding:7px 10px;font-size:12px;font-family:inherit;cursor:pointer;outline:none;margin-bottom:6px}
+.fsel:hover{border-color:rgba(255,255,255,.2)}
+.sb-foot{padding:10px 8px;border-top:1px solid rgba(255,255,255,.06)}
+.col-btn{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;color:#6b7280;font-size:12px}
+.col-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0;transition:transform .3s}
+.sidebar.collapsed .col-btn svg{transform:rotate(180deg)}
+.col-label{white-space:nowrap}
+.sidebar.collapsed .col-label{opacity:0}
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-width:0}
 .topbar{padding:14px 28px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;background:#0a0e1a;position:sticky;top:0;z-index:10}
-.topbar-title{font-size:16px;font-weight:600;color:#fff}
-.topbar-meta{font-size:12px;color:#4b5563}
-.topbar-right{display:flex;align-items:center;gap:8px}
+.tb-title{font-size:16px;font-weight:600;color:#fff}
+.tb-meta{font-size:12px;color:#4b5563}
+.tb-right{display:flex;align-items:center;gap:8px}
 .live-dot{width:6px;height:6px;border-radius:50%;background:#4ade9a;box-shadow:0 0 6px #4ade9a;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-.live-label{font-size:11px;color:#4ade9a;font-weight:600;letter-spacing:.06em}
-.refresh-btn{padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#9ca3af;font-size:11px;cursor:pointer;font-family:inherit}
-.refresh-btn:hover{border-color:#4ade9a;color:#4ade9a}
+.live-lbl{font-size:11px;color:#4ade9a;font-weight:600;letter-spacing:.06em}
+.ref-btn{padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#9ca3af;font-size:11px;cursor:pointer;font-family:inherit}
+.ref-btn:hover{border-color:#4ade9a;color:#4ade9a}
 .content{padding:24px 28px;flex:1}
 .page{display:none}.page.active{display:block}
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;gap:12px;color:#6b7280}
 .spinner{width:32px;height:32px;border:2px solid rgba(255,255,255,.08);border-top-color:#4ade9a;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.error-box{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:12px;padding:16px 20px;color:#f87171;font-size:13px;margin:20px}
-.metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:24px}
-.mcard{background:#111827;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden}
-.mcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:12px 12px 0 0}
-.mcard.c-blue::before{background:#60a5fa}.mcard.c-red::before{background:#f87171}
-.mcard.c-green::before{background:#4ade9a}.mcard.c-amber::before{background:#fbbf24}
-.mcard.c-teal::before{background:#2dd4bf}.mcard.c-purple::before{background:#a78bfa}
-.mcard-label{font-size:10px;color:#6b7280;font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
-.mcard-value{font-size:28px;font-weight:700;line-height:1;color:#fff}
-.mcard-value.warn{color:#f87171}.mcard-value.ok{color:#4ade9a}
-.mcard-sub{font-size:10px;color:#4b5563;margin-top:4px}
-.type-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
-.tcard{background:#1a2744;border:1px solid rgba(96,165,250,.2);border-radius:12px;padding:14px 16px}
-.tcard-label{font-size:11px;color:#93c5fd;font-weight:500;margin-bottom:6px}
-.tcard-value{font-size:26px;font-weight:700;color:#fff}
-.section-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#4b5563;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.section-label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.05)}
-.charts-3{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:12px;margin-bottom:20px}
-.charts-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.err-box{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:12px;padding:16px 20px;color:#f87171;font-size:13px;margin:20px}
+.metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px}
+.mc{background:#111827;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden}
+.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:12px 12px 0 0}
+.mc.bl::before{background:#60a5fa}.mc.rd::before{background:#f87171}
+.mc.gn::before{background:#4ade9a}.mc.am::before{background:#fbbf24}
+.mc.tl::before{background:#2dd4bf}.mc.pu::before{background:#a78bfa}
+.mc-lbl{font-size:10px;color:#6b7280;font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
+.mc-val{font-size:28px;font-weight:700;line-height:1;color:#fff}
+.mc-val.warn{color:#f87171}.mc-val.ok{color:#4ade9a}
+.mc-sub{font-size:10px;color:#4b5563;margin-top:4px}
+.type-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.tc{background:#1a2744;border:1px solid rgba(96,165,250,.2);border-radius:12px;padding:14px 16px}
+.tc-lbl{font-size:11px;color:#93c5fd;font-weight:500;margin-bottom:6px}
+.tc-val{font-size:26px;font-weight:700;color:#fff}
+.sec-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#4b5563;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.05)}
+.g3{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:12px;margin-bottom:20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
 .card{background:#111827;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px 18px}
 .card h3{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6b7280;margin-bottom:12px}
-.chart-wrap{position:relative;width:100%}
+.cw{position:relative;width:100%}
 .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;align-items:center}
-.filter-select{background:#111827;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#9ca3af;padding:7px 12px;font-size:12px;font-family:inherit;cursor:pointer;outline:none;min-width:150px}
-.chip-group{display:flex;gap:5px;flex-wrap:wrap}
+.fsel2{background:#111827;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#9ca3af;padding:7px 12px;font-size:12px;font-family:inherit;cursor:pointer;outline:none;min-width:140px}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
 .chip{padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:transparent;cursor:pointer;font-size:11px;color:#9ca3af;font-weight:500}
 .chip.active{background:rgba(74,222,154,.12);border-color:#4ade9a;color:#4ade9a}
-.tbl-wrap{overflow-x:auto}
+.twrap{overflow-x:auto}
 .tbl{width:100%;border-collapse:collapse;font-size:12px}
 .tbl th{text-align:left;padding:8px 10px;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#4b5563;border-bottom:1px solid rgba(255,255,255,.07);white-space:nowrap}
 .tbl td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:#d1d5db;white-space:nowrap}
 .tbl tr:hover td{background:rgba(255,255,255,.02)}
-.td-pos{font-weight:600;color:#e5e7eb;max-width:160px;overflow:hidden;text-overflow:ellipsis}
-.days-cell{display:inline-block;padding:2px 8px;border-radius:6px;font-weight:700;font-size:12px;min-width:36px;text-align:center}
-.days-red{background:rgba(248,113,113,.25);color:#fca5a5}
-.days-amber{background:rgba(251,191,36,.2);color:#fde68a}
-.days-green{background:rgba(74,222,154,.15);color:#6ee7b7}
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
-.badge-red{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.2)}
-.badge-green{background:rgba(74,222,154,.12);color:#4ade9a;border:1px solid rgba(74,222,154,.18)}
-.badge-amber{background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.18)}
+.tdp{font-weight:600;color:#e5e7eb;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+.dc{display:inline-block;padding:2px 8px;border-radius:6px;font-weight:700;font-size:12px;min-width:36px;text-align:center}
+.dr{background:rgba(248,113,113,.25);color:#fca5a5}
+.da{background:rgba(251,191,36,.2);color:#fde68a}
+.dg{background:rgba(74,222,154,.15);color:#6ee7b7}
+.bdg{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.br{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.2)}
+.bg{background:rgba(74,222,154,.12);color:#4ade9a;border:1px solid rgba(74,222,154,.18)}
+.ba{background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.18)}
 .rec-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
-.rec-card{background:#111827;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px 20px}
-.rec-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-bottom:12px}
-.rec-name{font-size:15px;font-weight:600;color:#fff;margin-bottom:2px}
-.rec-meta{font-size:11px;color:#6b7280;margin-bottom:14px}
-.rec-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.rec-stat{background:#0d1120;border-radius:8px;padding:10px 8px;text-align:center}
-.rec-stat-val{font-size:18px;font-weight:700;color:#fff}
-.rec-stat-lab{font-size:10px;color:#6b7280;margin-top:2px}
+.rc{background:#111827;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px 20px}
+.rav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-bottom:12px}
+.rn{font-size:15px;font-weight:600;color:#fff;margin-bottom:2px}
+.rm{font-size:11px;color:#6b7280;margin-bottom:14px}
+.rstats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.rst{background:#0d1120;border-radius:8px;padding:10px 8px;text-align:center}
+.rsv{font-size:18px;font-weight:700;color:#fff}
+.rsl{font-size:10px;color:#6b7280;margin-top:2px}
 .sla-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
 .sla-row:last-child{border-bottom:none}
-.sla-pos{flex:1;font-size:12px;font-weight:500;color:#e5e7eb;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sla-rec{font-size:11px;color:#6b7280;min-width:48px}
-.sla-num{font-size:13px;font-weight:700;min-width:30px;text-align:right}
-.sla-bar{flex:1;max-width:80px;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
-.sla-fill{height:100%;border-radius:2px}
+.sp{flex:1;font-size:12px;font-weight:500;color:#e5e7eb;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sr{font-size:11px;color:#6b7280;min-width:48px}
+.sn{font-size:13px;font-weight:700;min-width:30px;text-align:right}
+.sb2{flex:1;max-width:80px;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
+.sf{height:100%;border-radius:2px}
 </style>
 </head>
 <body>
 
 <div class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-logo">MT</div>
-    <div><div class="sidebar-brand">MoonTech TA</div><div class="sidebar-sub">MXIN Holdings</div></div>
+  <div class="sb-header">
+    <div class="sb-logo">MT</div>
+    <div><div class="sb-brand">MoonTech TA</div><div class="sb-sub">MXIN Holdings</div></div>
   </div>
   <nav class="nav">
-    <div class="nav-section">Reports</div>
+    <div class="sb-sec">Reports</div>
     <div class="nav-item active" onclick="goPage('overview',this)">
       <div class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
       <span class="nav-label">Top Level</span>
@@ -135,38 +137,29 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
       <div class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
       <span class="nav-label">Monday Review</span>
     </div>
-    <div class="nav-section" style="margin-top:12px">Filters</div>
-    <div style="padding:4px 4px 0">
-      <select class="filter-select" id="globalCompany" style="width:100%;margin-bottom:6px" onchange="applyGlobal()">
-        <option value="All">All companies</option>
-        <option value="MoonTech">MoonTech</option>
-        <option value="ITCAN">ITCAN</option>
-      </select>
-      <select class="filter-select" id="globalRecruiter" style="width:100%;margin-bottom:6px" onchange="applyGlobal()">
-        <option value="All">All recruiters</option>
-        <option value="Nour J">Nour J</option>
-        <option value="Nour M">Nour M</option>
-        <option value="Aju">Aju</option>
-      </select>
-      <div style="font-size:10px;color:#4b5563;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin:8px 0 4px">Date range (open date)</div>
-      <select class="filter-select" id="globalDept" style="width:100%;margin-bottom:6px" onchange="applyGlobal()">
-        <option value="All">All departments</option>
-      </select>
-      <select class="filter-select" id="dateRange" style="width:100%;margin-bottom:6px" onchange="applyGlobal()">
-        <option value="All">All time</option>
-        <option value="7">Last 7 days</option>
-        <option value="30">Last 30 days</option>
-        <option value="60">Last 60 days</option>
-        <option value="90">Last 90 days</option>
-        <option value="180">Last 6 months</option>
-        <option value="365">Last 12 months</option>
-      </select>
-    </div>
   </nav>
-  <div class="sidebar-footer">
-    <div class="collapse-btn" onclick="toggleSidebar()">
+  <div class="sb-filters">
+    <div class="sb-sec">Filters</div>
+    <select class="fsel" id="gCompany" onchange="applyG()">
+      <option value="All">All companies</option>
+      <option value="MoonTech">MoonTech</option>
+      <option value="ITCAN">ITCAN</option>
+    </select>
+    <select class="fsel" id="gRecruiter" onchange="applyG()"><option value="All">All recruiters</option></select>
+    <select class="fsel" id="gDept" onchange="applyG()"><option value="All">All departments</option></select>
+    <select class="fsel" id="gDate" onchange="applyG()">
+      <option value="All">All time</option>
+      <option value="30">Last 30 days</option>
+      <option value="60">Last 60 days</option>
+      <option value="90">Last 90 days</option>
+      <option value="180">Last 6 months</option>
+      <option value="365">Last 12 months</option>
+    </select>
+  </div>
+  <div class="sb-foot">
+    <div class="col-btn" onclick="document.getElementById('sidebar').classList.toggle('collapsed');setTimeout(()=>Object.values(CI).forEach(c=>{try{c.resize()}catch(e){}}),300)">
       <svg viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
-      <span class="collapse-label">Collapse</span>
+      <span class="col-label">Collapse</span>
     </div>
   </div>
 </div>
@@ -174,89 +167,92 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
 <div class="main">
   <div class="topbar">
     <div>
-      <div class="topbar-title" id="topbar-title">Top Level Overview</div>
-      <div class="topbar-meta">ITCAN & MoonTech · <span id="lastUpdated">Loading...</span></div>
+      <div class="tb-title" id="tb-title">Top Level Overview</div>
+      <div class="tb-meta">ITCAN & MoonTech · <span id="tb-time">Loading...</span></div>
     </div>
-    <div class="topbar-right">
-      <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
-      <div class="live-dot"></div>
-      <div class="live-label">LIVE</div>
+    <div class="tb-right">
+      <button class="ref-btn" onclick="loadData()">↻ Refresh</button>
+      <div class="live-dot"></div><div class="live-lbl">LIVE</div>
     </div>
   </div>
-
   <div class="content">
-    <div id="globalLoading" class="loading"><div class="spinner"></div><div>Fetching live data from Google Sheets...</div></div>
-    <div id="globalError" style="display:none"></div>
-    <div id="allPages" style="display:none">
+    <div id="g-loading" class="loading"><div class="spinner"></div><div>Fetching live data...</div></div>
+    <div id="g-error" style="display:none"></div>
+    <div id="g-pages" style="display:none">
 
+      <!-- OVERVIEW -->
       <div class="page active" id="page-overview">
-        <div class="metrics" id="metricsRow"></div>
-        <div class="type-cards" id="typeCards"></div>
-        <div class="section-label">Pipeline breakdown</div>
-        <div class="charts-3">
-          <div class="card"><h3>Status breakdown</h3><div class="chart-wrap" style="height:190px"><canvas id="cStatus"></canvas></div></div>
-          <div class="card"><h3>Role type mix</h3><div class="chart-wrap" style="height:190px"><canvas id="cRoleType"></canvas></div></div>
-          <div class="card"><h3>Priority distribution</h3><div class="chart-wrap" style="height:190px"><canvas id="cPriority"></canvas></div></div>
+        <div class="metrics" id="m-row"></div>
+        <div class="type-cards" id="t-cards"></div>
+        <div class="sec-lbl">Pipeline breakdown</div>
+        <div class="g3">
+          <div class="card"><h3>Status breakdown</h3><div class="cw" style="height:190px"><canvas id="cStatus"></canvas></div></div>
+          <div class="card"><h3>Role type mix</h3><div class="cw" style="height:190px"><canvas id="cRoleType"></canvas></div></div>
+          <div class="card"><h3>Priority — active roles only</h3><div class="cw" style="height:190px"><canvas id="cPriority"></canvas></div></div>
         </div>
       </div>
 
+      <!-- PIPELINE -->
       <div class="page" id="page-pipeline">
         <div class="filters">
-          <select class="filter-select" id="pfStatus" onchange="renderPipeline()">
+          <select class="fsel2" id="pStatus" onchange="renderPipeline()">
             <option value="Open" selected>Open only</option>
             <option value="All">All statuses</option>
             <option value="Closed">Closed</option>
             <option value="Paused">Paused</option>
           </select>
-          <select class="filter-select" id="pfRoleType" onchange="renderPipeline()">
+          <select class="fsel2" id="pRoleType" onchange="renderPipeline()">
             <option value="All">All role types</option>
             <option value="Full Time">Full Time</option>
             <option value="Part Time">Part Time</option>
             <option value="Advisor">Advisor</option>
+            <option value="Fractional">Fractional</option>
           </select>
-          <div class="chip-group" id="overSlaChips">
-            <span class="chip active" onclick="setOvFilter(this,'All')">All</span>
-            <span class="chip" onclick="setOvFilter(this,'Yes')">Over SLA only</span>
-            <span class="chip" onclick="setOvFilter(this,'No')">Within SLA</span>
+          <div class="chips" id="ov-chips">
+            <span class="chip active" onclick="setOv(this,'All')">All</span>
+            <span class="chip" onclick="setOv(this,'Yes')">Over SLA only</span>
+            <span class="chip" onclick="setOv(this,'No')">Within SLA</span>
           </div>
         </div>
         <div class="card"><h3>Pipeline health table</h3>
-          <div class="tbl-wrap"><table class="tbl">
+          <div class="twrap"><table class="tbl">
             <thead><tr><th>#</th><th>Position</th><th>Company</th><th>Recruiter</th><th>Stage</th><th>Days open</th><th>SLA</th><th>Over SLA</th><th>Status</th><th>HM</th><th>Role type</th><th>Budget AED</th><th>Category</th></tr></thead>
-            <tbody id="pipelineTbody"></tbody>
+            <tbody id="p-tbody"></tbody>
           </table></div>
         </div>
       </div>
 
+      <!-- CAPACITY -->
       <div class="page" id="page-capacity">
-        <div class="rec-cards" id="recCards"></div>
-        <div class="charts-2">
-          <div class="card"><h3>Open vs over-SLA per recruiter</h3><div class="chart-wrap" style="height:200px"><canvas id="cCapacity"></canvas></div></div>
-          <div class="card"><h3>Avg days open per recruiter</h3><div class="chart-wrap" style="height:200px"><canvas id="cAvgDays"></canvas></div></div>
+        <div class="rec-cards" id="r-cards"></div>
+        <div class="g2">
+          <div class="card"><h3>Open vs over-SLA per recruiter</h3><div class="cw" style="height:200px"><canvas id="cCap"></canvas></div></div>
+          <div class="card"><h3>Avg days open per recruiter</h3><div class="cw" style="height:200px"><canvas id="cAvg"></canvas></div></div>
         </div>
-        <div class="section-label">SLA health — open roles</div>
-        <div class="card"><h3>Top 10 by urgency</h3><div id="slaRows"></div></div>
+        <div class="sec-lbl">SLA health — open roles</div>
+        <div class="card"><h3>Top 10 by urgency</h3><div id="sla-rows"></div></div>
       </div>
 
+      <!-- MONDAY -->
       <div class="page" id="page-monday">
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px" id="monMetrics"></div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px" id="mon-metrics"></div>
         <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:14px;margin-bottom:20px">
           <div class="card"><h3>At-risk roles — over SLA</h3>
-            <div class="tbl-wrap"><table class="tbl">
+            <div class="twrap"><table class="tbl">
               <thead><tr><th>#</th><th>Position</th><th>Company</th><th>Recruiter</th><th>Days open</th><th>Days over SLA</th><th>HM</th></tr></thead>
-              <tbody id="atRiskTbody"></tbody>
+              <tbody id="risk-tbody"></tbody>
             </table></div>
           </div>
-          <div class="card"><h3>Recently closed roles</h3><div class="chart-wrap" style="height:240px"><canvas id="cClosedWeek"></canvas></div></div>
+          <div class="card"><h3>Recently closed (by close date)</h3><div class="cw" style="height:260px"><canvas id="cRecent"></canvas></div></div>
         </div>
-        <div class="section-label">Historical benchmarks</div>
+        <div class="sec-lbl">Historical benchmarks</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
-          <div class="card"><h3>Avg time to fill — monthly</h3><div class="chart-wrap" style="height:220px"><canvas id="cTtf"></canvas></div></div>
-          <div class="card"><h3>Monthly pipeline movement</h3><div class="chart-wrap" style="height:220px"><canvas id="cMovement"></canvas></div></div>
+          <div class="card"><h3>Avg time to fill — monthly</h3><div class="cw" style="height:220px"><canvas id="cTtf"></canvas></div></div>
+          <div class="card"><h3>Monthly pipeline movement</h3><div class="cw" style="height:220px"><canvas id="cMove"></canvas></div></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-          <div class="card"><h3>Closed by role type</h3><div class="chart-wrap" style="height:220px"><canvas id="cClosingRole"></canvas></div></div>
-          <div class="card"><h3>Roles opened vs closed by month</h3><div class="chart-wrap" style="height:220px"><canvas id="cOpenedVsClosed"></canvas></div></div>
+          <div class="card"><h3>Closed by role type</h3><div class="cw" style="height:220px"><canvas id="cCRT"></canvas></div></div>
+          <div class="card"><h3>Opened vs closed by month</h3><div class="cw" style="height:220px"><canvas id="cOvC"></canvas></div></div>
         </div>
       </div>
 
@@ -267,71 +263,108 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
 <script>
 Chart.defaults.color='#6b7280';
 Chart.defaults.borderColor='rgba(255,255,255,0.05)';
-const API_URL='https://script.google.com/macros/s/AKfycbxzs7qdrJK93WwHBKnQ2RN8aWcr9-EbAmSIYitoEiUQAiMu2sSRw6hIDhrWsTDgUz3X6A/exec';
-let RAW=[],gF={company:'All',recruiter:'All',dept:'All',dateRange:'All'},pF={status:'Open',roleType:'All',ov:'All'},ci={};
-const Gg={grid:{color:'rgba(255,255,255,0.05)'},ticks:{font:{size:11},color:'#6b7280'}};
 
+const API='https://script.google.com/macros/s/AKfycbxzs7qdrJK93WwHBKnQ2RN8aWcr9-EbAmSIYitoEiUQAiMu2sSRw6hIDhrWsTDgUz3X6A/exec';
+const GG={grid:{color:'rgba(255,255,255,0.05)'},ticks:{font:{size:11},color:'#6b7280'}};
+let RAW=[], CI={};
+let GF={company:'All',recruiter:'All',dept:'All',date:'All'};
+let PF={status:'Open',roleType:'All',ov:'All'};
+
+/* ── LOAD ── */
 async function loadData(){
-  document.getElementById('globalLoading').style.display='flex';
-  document.getElementById('globalError').style.display='none';
-  document.getElementById('allPages').style.display='none';
+  show('g-loading');hide('g-error');hide('g-pages');
   try{
-    const res=await fetch(API_URL);
+    const res=await fetch(API);
     if(!res.ok) throw new Error('HTTP '+res.status);
     const json=await res.json();
     if(!Array.isArray(json)||!json.length) throw new Error('No data returned');
-    RAW=json.map(r=>{
-      const days=parseInt(r.Days_Open)||0, sla=parseInt(r.SLA_Days)||45;
-      const rec=String(r.Recruiter||'');
-      const rn=rec.toLowerCase().includes('jabaseh')||rec.toLowerCase().includes('nour j')?'Nour J':
-               rec.toLowerCase().includes('mokhtar')||rec.toLowerCase().includes('nour m')?'Nour M':
-               rec.toLowerCase().includes('aju')?'Aju':rec||'Other';
-      const st=String(r.Status||'').toLowerCase();
-      const stn=st.includes('open')?'Open':st.includes('closed')?'Closed':
-               (st.includes('pause')||st.includes('cancel')||st.includes('direction'))?'Paused':'Other';
-      return{
-        pos:String(r.Position||'').trim(),company:String(r.Company||'').trim(),
-        dept:String(r.Department||'').trim(),
-        recruiter:rn,status:stn,roleType:String(r.Role_Type||r.Position_Type||'Full Time').trim(),
-        posType:String(r.Position_Type||'').trim(),days,sla,
-        stage:String(r.Stage||'').trim(),
-        budget:parseInt(String(r.Budget_AED||'').replace(/[^0-9]/g,''))||0,
-        cat:String(r['Budget category']||r.Budget_category||'').trim(),
-        priority:String(r.Priority||'').trim(),hm:String(r.Hiring_Manager||'').trim(),
-        daysOver:parseInt(r.Days_Over_SLA)||Math.max(0,days-sla),
-        openDate:String(r.Open_Date||'').trim(),closedDate:String(r.Closed_Date||'').trim(),
-      };
-    }).filter(r=>r.pos);
-    document.getElementById('globalLoading').style.display='none';
-    document.getElementById('allPages').style.display='block';
-    document.getElementById('lastUpdated').textContent='Live · '+new Date().toLocaleTimeString();
-    // Populate recruiter dropdown dynamically
+    RAW=json.map(parseRow).filter(r=>r.pos);
+    // populate dropdowns
     const recs=[...new Set(RAW.map(r=>r.recruiter).filter(r=>r&&r!=='Other'))].sort();
-    const sel=document.getElementById('globalRecruiter');
-    sel.innerHTML='<option value="All">All recruiters</option>'+recs.map(r=>`<option value="${r}">${r}</option>`).join('');
-    // Populate department dropdown dynamically
+    setOpts('gRecruiter','All recruiters',recs);
     const depts=[...new Set(RAW.map(r=>r.dept).filter(d=>d))].sort();
-    const dsel=document.getElementById('globalDept');
-    dsel.innerHTML='<option value="All">All departments</option>'+depts.map(d=>`<option value="${d}">${d}</option>`).join('');
+    setOpts('gDept','All departments',depts);
+    hide('g-loading');show('g-pages');
+    document.getElementById('tb-time').textContent='Live · '+new Date().toLocaleTimeString();
     renderAll();
   }catch(e){
-    document.getElementById('globalLoading').style.display='none';
-    document.getElementById('globalError').style.display='block';
-    document.getElementById('globalError').innerHTML=`<div class="error-box">❌ ${e.message}<br><br>Make sure the Apps Script is deployed with <b>Anyone</b> access and CORS enabled.</div>`;
+    hide('g-loading');show('g-error');
+    document.getElementById('g-error').innerHTML=`<div class="err-box">❌ ${e.message}</div>`;
   }
 }
 
+function parseRow(r){
+  // recruiter
+  const rec=String(r.Recruiter||'');
+  const rl=rec.toLowerCase();
+  const recruiter=rl.includes('jabaseh')||rl.includes('nour j')?'Nour J':
+                  rl.includes('mokhtar')||rl.includes('nour m')?'Nour M':
+                  rl.includes('aju')?'Aju':rec||'Other';
+  // status
+  const sl=String(r.Status||'').toLowerCase();
+  const status=sl.includes('open')?'Open':sl.includes('closed')?'Closed':
+               (sl.includes('pause')||sl.includes('cancel')||sl.includes('direction'))?'Paused':'Other';
+  // role type
+  const rawRT=String(r.Role_Type||'').trim();
+  const rtl=rawRT.toLowerCase();
+  const roleType=rtl.includes('full')||rtl==='ft'?'Full Time':
+                 rtl.includes('part')||rtl==='pt'?'Part Time':
+                 rtl.includes('adv')?'Advisor':
+                 rtl.includes('frac')?'Fractional':
+                 rawRT||'Full Time';
+  // priority normalise
+  const rawP=String(r.Priority||'').trim();
+  const pl=rawP.toLowerCase();
+  const priority=pl.includes('urgent')?'Urgent':
+                 pl.includes('high')?'High':
+                 pl.includes('medium')?'Medium':
+                 pl.includes('low')?'Low':
+                 pl.includes('pause')||pl.includes('cancel')?'Paused':rawP;
+  const days=parseInt(r.Days_Open)||0;
+  const sla=parseInt(r.SLA_Days)||45;
+  return{
+    pos:     String(r.Position||'').trim(),
+    company: String(r.Company||'').trim(),
+    dept:    String(r.Department||'').trim(),
+    recruiter,status,roleType,priority,
+    posType: String(r.Position_Type||'').trim(),
+    days,sla,
+    daysOver:parseInt(r.Days_Over_SLA)||Math.max(0,days-sla),
+    stage:   String(r.Stage||'').trim(),
+    budget:  parseInt(String(r.Budget_AED||'').replace(/[^0-9]/g,''))||0,
+    cat:     String(r['Budget category']||r.Budget_category||'').trim(),
+    hm:      String(r.Hiring_Manager||'').trim(),
+    openDate:String(r.Open_Date||'').trim(),
+    closedDate:String(r.Closed_Date||'').trim(),
+  };
+}
+
+function setOpts(id,all,vals){
+  const s=document.getElementById(id);
+  s.innerHTML=`<option value="All">${all}</option>`+vals.map(v=>`<option value="${v}">${v}</option>`).join('');
+}
+function show(id){document.getElementById(id).style.display=''}
+function hide(id){document.getElementById(id).style.display='none'}
+
+/* ── FILTER ── */
+function applyG(){
+  GF.company=document.getElementById('gCompany').value;
+  GF.recruiter=document.getElementById('gRecruiter').value;
+  GF.dept=document.getElementById('gDept').value;
+  GF.date=document.getElementById('gDate').value;
+  renderAll();
+}
+
 function gd(){
-  const cutoff = gF.dateRange!=='All' ? new Date(Date.now()-parseInt(gF.dateRange)*86400000) : null;
+  const cutoff=GF.date!=='All'?new Date(Date.now()-parseInt(GF.date)*86400000):null;
   return RAW.filter(r=>{
-    if(gF.company!=='All'&&r.company!==gF.company) return false;
-    if(gF.recruiter!=='All'&&r.recruiter!==gF.recruiter) return false;
-    if(gF.dept!=='All'&&r.dept!==gF.dept) return false;
+    if(GF.company!=='All'&&r.company!==GF.company) return false;
+    if(GF.recruiter!=='All'&&r.recruiter!==GF.recruiter) return false;
+    if(GF.dept!=='All'&&r.dept!==GF.dept) return false;
     if(!cutoff) return true;
-    if(r.status==='Open'||r.status==='Paused'){
-      const od=r.openDate?new Date(r.openDate):null;
-      return od&&!isNaN(od)&&od>=cutoff;
-    }
+    // Open/Paused — always show (currently live)
+    if(r.status==='Open'||r.status==='Paused') return true;
+    // Closed — filter by closed date
     if(r.status==='Closed'){
       const cd=r.closedDate?new Date(r.closedDate):null;
       if(cd&&!isNaN(cd)) return cd>=cutoff;
@@ -341,133 +374,160 @@ function gd(){
     return true;
   });
 }
-function pd(){return gd().filter(r=>(pF.status==='All'||r.status===pF.status)&&(pF.roleType==='All'||r.roleType===pF.roleType)&&(pF.ov==='All'||(pF.ov==='Yes'?r.daysOver>0:r.daysOver===0)));}
-function applyGlobal(){
-  gF.company=document.getElementById('globalCompany').value;
-  gF.recruiter=document.getElementById('globalRecruiter').value;
-  gF.dept=document.getElementById('globalDept').value;
-  gF.dateRange=document.getElementById('dateRange').value;
-  renderAll();
-}
-function clearDates(){
-  document.getElementById('dateRange').value='All';
-  gF.dateRange='All';
-  renderAll();
-}
-function mk(id,cfg){if(ci[id])ci[id].destroy();const el=document.getElementById(id);if(el)ci[id]=new Chart(el,cfg);}
 
-function renderAll(){renderOverview();renderPipeline();renderCapacity();renderMonday();document.getElementById('sla-badge').textContent=gd().filter(r=>r.status==='Open'&&r.daysOver>0).length;}
+function pd(){
+  return gd().filter(r=>{
+    if(PF.status!=='All'&&r.status!==PF.status) return false;
+    if(PF.roleType!=='All'&&r.roleType!==PF.roleType) return false;
+    if(PF.ov==='Yes'&&r.daysOver===0) return false;
+    if(PF.ov==='No'&&r.daysOver>0) return false;
+    return true;
+  });
+}
 
+/* ── CHART HELPER ── */
+function mk(id,cfg){
+  if(CI[id]) CI[id].destroy();
+  const el=document.getElementById(id);
+  if(el) CI[id]=new Chart(el,cfg);
+}
+
+/* ── RENDER ALL ── */
+function renderAll(){
+  renderOverview();
+  renderPipeline();
+  renderCapacity();
+  renderMonday();
+  document.getElementById('sla-badge').textContent=gd().filter(r=>r.status==='Open'&&r.daysOver>0).length;
+}
+
+/* ── OVERVIEW ── */
 function renderOverview(){
-  const d=gd(),open=d.filter(r=>r.status==='Open'),closed=d.filter(r=>r.status==='Closed'),paused=d.filter(r=>r.status==='Paused');
+  const d=gd();
+  const open=d.filter(r=>r.status==='Open');
+  const closed=d.filter(r=>r.status==='Closed');
+  const paused=d.filter(r=>r.status==='Paused');
   const overSla=open.filter(r=>r.daysOver>0);
   const avgC=closed.length?Math.round(closed.reduce((s,r)=>s+r.days,0)/closed.length):0;
   const avgO=open.length?Math.round(open.reduce((s,r)=>s+r.days,0)/open.length):0;
-  document.getElementById('metricsRow').innerHTML=`
-    <div class="mcard c-blue"><div class="mcard-label">Open positions</div><div class="mcard-value">${open.length}</div><div class="mcard-sub">Active pipeline</div></div>
-    <div class="mcard c-red"><div class="mcard-label">Roles over SLA</div><div class="mcard-value warn">${overSla.length}</div><div class="mcard-sub">${open.length?Math.round(overSla.length/open.length*100):0}% of open</div></div>
-    <div class="mcard c-green"><div class="mcard-label">Closed (≤30d)</div><div class="mcard-value ok">${closed.filter(r=>r.days<=30).length}</div><div class="mcard-sub">Fast closes</div></div>
-    <div class="mcard c-amber"><div class="mcard-label">Avg days to close</div><div class="mcard-value">${avgC}</div><div class="mcard-sub">Target: 45 days</div></div>
-    <div class="mcard c-teal"><div class="mcard-label">Avg days open</div><div class="mcard-value">${avgO}</div><div class="mcard-sub">Current open roles</div></div>
-    <div class="mcard c-purple"><div class="mcard-label">Paused / on hold</div><div class="mcard-value">${paused.length}</div><div class="mcard-sub">${d.length?Math.round(closed.length/d.length*100):0}% closing rate</div></div>`;
-  document.getElementById('typeCards').innerHTML=['Full Time','Fractional','Advisor','Part Time'].map(t=>`<div class="tcard"><div class="tcard-label">Open — ${t}</div><div class="tcard-value">${open.filter(r=>r.roleType===t).length}</div></div>`).join('');
-  mk('cStatus',{type:'bar',data:{labels:['Open','Closed','Paused'],datasets:[{data:[open.length,closed.length,paused.length],backgroundColor:['#60a5fa','#4ade9a','#fbbf24'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:Gg.grid,ticks:Gg.ticks},x:{grid:{display:false},ticks:Gg.ticks}}}});
-  mk('cRoleType',{type:'doughnut',data:{labels:['Full Time','Part Time','Advisor','Fractional'],datasets:[{data:['Full Time','Part Time','Advisor','Fractional'].map(t=>d.filter(r=>r.roleType===t).length),backgroundColor:['#60a5fa','#4ade9a','#fbbf24','#a78bfa'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'bottom',labels:{font:{size:10},color:'#9ca3af',padding:8,usePointStyle:true,pointStyle:'rect'}}}}});
-  // Priority chart — OPEN roles only, Urgent 1-5 all count as Urgent
-  const active=open; // only truly open roles
-  function normPriority(p){
-    if(!p) return 'Other';
-    const pl=p.toLowerCase();
-    if(pl.includes('urgent')) return 'Urgent';
-    if(pl.includes('high')) return 'High';
-    if(pl.includes('medium')) return 'Medium';
-    if(pl.includes('low')) return 'Low';
-    if(pl.includes('pause')) return 'Paused';
-    return 'Other';
-  }
+  const rate=d.length?Math.round(closed.length/d.length*100):0;
+
+  document.getElementById('m-row').innerHTML=`
+    <div class="mc bl"><div class="mc-lbl">Open positions</div><div class="mc-val">${open.length}</div><div class="mc-sub">Active pipeline</div></div>
+    <div class="mc rd"><div class="mc-lbl">Roles over SLA</div><div class="mc-val warn">${overSla.length}</div><div class="mc-sub">${open.length?Math.round(overSla.length/open.length*100):0}% of open</div></div>
+    <div class="mc gn"><div class="mc-lbl">Closed (≤30d)</div><div class="mc-val ok">${closed.filter(r=>r.days<=30).length}</div><div class="mc-sub">Fast closes</div></div>
+    <div class="mc am"><div class="mc-lbl">Avg days to close</div><div class="mc-val">${avgC}</div><div class="mc-sub">Target: 45 days</div></div>
+    <div class="mc tl"><div class="mc-lbl">Avg days open</div><div class="mc-val">${avgO}</div><div class="mc-sub">Current open roles</div></div>
+    <div class="mc pu"><div class="mc-lbl">Paused / on hold</div><div class="mc-val">${paused.length}</div><div class="mc-sub">${rate}% closing rate</div></div>`;
+
+  const types=['Full Time','Fractional','Advisor','Part Time'];
+  document.getElementById('t-cards').innerHTML=types.map(t=>`<div class="tc"><div class="tc-lbl">Open — ${t}</div><div class="tc-val">${open.filter(r=>r.roleType===t).length}</div></div>`).join('');
+
+  mk('cStatus',{type:'bar',data:{labels:['Open','Closed','Paused'],datasets:[{data:[open.length,closed.length,paused.length],backgroundColor:['#60a5fa','#4ade9a','#fbbf24'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:GG.grid,ticks:GG.ticks},x:{grid:{display:false},ticks:GG.ticks}}}});
+
+  // Role type — with numbers on slices
+  const rtTypes=['Full Time','Part Time','Advisor','Fractional'];
+  const rtCounts=rtTypes.map(t=>d.filter(r=>r.roleType===t).length);
+  mk('cRoleType',{type:'doughnut',
+    data:{labels:rtTypes,datasets:[{data:rtCounts,backgroundColor:['#60a5fa','#4ade9a','#fbbf24','#a78bfa'],borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'58%',
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},color:'#9ca3af',padding:8,usePointStyle:true,pointStyle:'rect'}},
+        tooltip:{callbacks:{label:i=>{const v=rtCounts[i.dataIndex],t=rtCounts.reduce((a,b)=>a+b,0);return ` ${rtTypes[i.dataIndex]}: ${v} (${t?Math.round(v/t*100):0}%)`;}}}}},
+    plugins:[{id:'sliceNums',afterDraw(chart){
+      const{ctx,chartArea:{top,bottom,left,right}}=chart;
+      const cx=(left+right)/2,cy=(top+bottom)/2;
+      chart.data.datasets[0].data.forEach((val,i)=>{
+        if(!val)return;
+        const arc=chart.getDatasetMeta(0).data[i];
+        const{startAngle,endAngle,outerRadius,innerRadius}=arc.getProps(['startAngle','endAngle','outerRadius','innerRadius']);
+        const mid=(startAngle+endAngle)/2,r2=(outerRadius+innerRadius)/2;
+        ctx.save();ctx.fillStyle='#fff';ctx.font='bold 11px Inter,system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(val,cx+r2*Math.cos(mid),cy+r2*Math.sin(mid));ctx.restore();
+      });
+    }}]});
+
+  // Priority — open roles only, normalised
   const pLevels=['Urgent','High','Medium','Low','Paused'];
-  const pCounts=pLevels.map(l=>active.filter(r=>normPriority(r.priority)===l).length);
   const pColors=['#f87171','#fbbf24','#60a5fa','#4ade9a','#6b7280'];
-  mk('cPriority',{type:'bar',data:{labels:pLevels,datasets:[{data:pCounts,backgroundColor:pColors,borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${pCounts[i.dataIndex]} roles`}}},scales:{y:{grid:Gg.grid,ticks:Gg.ticks},x:{grid:{display:false},ticks:Gg.ticks}}}});
+  const pCounts=pLevels.map(l=>open.filter(r=>r.priority===l).length);
+  mk('cPriority',{type:'bar',data:{labels:pLevels,datasets:[{data:pCounts,backgroundColor:pColors,borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:GG.grid,ticks:GG.ticks},x:{grid:{display:false},ticks:GG.ticks}}}});
 }
 
+/* ── PIPELINE ── */
 function renderPipeline(){
   const d=[...pd()].sort((a,b)=>b.daysOver-a.daysOver);
-  document.getElementById('pipelineTbody').innerHTML=d.map((r,i)=>{
-    const o=r.daysOver,cls=o>30?'days-red':o>0?'days-amber':'days-green';
-    return`<tr><td style="color:#4b5563">${i+1}</td><td class="td-pos">${r.pos}</td><td>${r.company}</td><td>${r.recruiter}</td><td style="color:#9ca3af;max-width:120px;overflow:hidden;text-overflow:ellipsis">${r.stage}</td><td style="font-weight:600">${r.days}</td><td style="color:#6b7280">${r.sla}</td><td><span class="days-cell ${cls}">${o}</span></td><td>${o>0?'<span class="badge badge-red">Yes</span>':'<span class="badge badge-green">No</span>'}</td><td>${r.hm}</td><td>${r.roleType}</td><td style="color:#9ca3af">${r.budget?r.budget.toLocaleString():'—'}</td><td style="font-size:11px;color:#6b7280">${r.cat}</td></tr>`;
+  document.getElementById('p-tbody').innerHTML=d.map((r,i)=>{
+    const o=r.daysOver,cl=o>30?'dr':o>0?'da':'dg';
+    return`<tr><td style="color:#4b5563">${i+1}</td><td class="tdp">${r.pos}</td><td>${r.company}</td><td>${r.recruiter}</td><td style="color:#9ca3af;max-width:120px;overflow:hidden;text-overflow:ellipsis">${r.stage}</td><td style="font-weight:600">${r.days}</td><td style="color:#6b7280">${r.sla}</td><td><span class="dc ${cl}">${o}</span></td><td>${o>0?'<span class="bdg br">Yes</span>':'<span class="bdg bg">No</span>'}</td><td>${r.hm}</td><td>${r.roleType}</td><td style="color:#9ca3af">${r.budget?r.budget.toLocaleString():'—'}</td><td style="font-size:11px;color:#6b7280">${r.cat}</td></tr>`;
   }).join('');
 }
 
+/* ── CAPACITY ── */
 function renderCapacity(){
   const d=gd();
-  // Get all unique recruiters from data
-  const recSet = new Set(d.map(r=>r.recruiter).filter(r=>r&&r!=='Other'));
-  const recs = [...recSet].sort();
+  const recSet=[...new Set(d.map(r=>r.recruiter).filter(r=>r&&r!=='Other'))].sort();
   const cols=['#60a5fa','#4ade9a','#a78bfa','#fbbf24','#f87171','#2dd4bf'];
-  
-  document.getElementById('recCards').innerHTML=recs.map((r,i)=>{
-    const all=d.filter(x=>x.recruiter===r),open=all.filter(x=>x.status==='Open'),closed=all.filter(x=>x.status==='Closed'),over=open.filter(x=>x.daysOver>0);
-    const col=cols[i%cols.length];
-    return`<div class="rec-card"><div class="rec-avatar" style="background:${col}22;color:${col}">${r.split(' ').map(w=>w[0]).join('')}</div><div class="rec-name">${r}</div><div class="rec-meta">Recruiter · MoonTech TA</div><div class="rec-stats"><div class="rec-stat"><div class="rec-stat-val" style="color:${col}">${open.length}</div><div class="rec-stat-lab">Open</div></div><div class="rec-stat"><div class="rec-stat-val" style="color:#4ade9a">${closed.length}</div><div class="rec-stat-lab">Closed</div></div><div class="rec-stat"><div class="rec-stat-val" style="color:#f87171">${over.length}</div><div class="rec-stat-lab">Over SLA</div></div></div></div>`;
+  document.getElementById('r-cards').innerHTML=recSet.map((r,i)=>{
+    const all=d.filter(x=>x.recruiter===r),op=all.filter(x=>x.status==='Open'),cl=all.filter(x=>x.status==='Closed'),ov=op.filter(x=>x.daysOver>0),c=cols[i%cols.length];
+    return`<div class="rc"><div class="rav" style="background:${c}22;color:${c}">${r.split(' ').map(w=>w[0]).join('')}</div><div class="rn">${r}</div><div class="rm">Recruiter · MoonTech TA</div><div class="rstats"><div class="rst"><div class="rsv" style="color:${c}">${op.length}</div><div class="rsl">Open</div></div><div class="rst"><div class="rsv" style="color:#4ade9a">${cl.length}</div><div class="rsl">Closed</div></div><div class="rst"><div class="rsv" style="color:#f87171">${ov.length}</div><div class="rsl">Over SLA</div></div></div></div>`;
   }).join('');
-
-  mk('cCapacity',{type:'bar',data:{labels:recs,datasets:[
-    {label:'Open',data:recs.map(r=>d.filter(x=>x.recruiter===r&&x.status==='Open').length),backgroundColor:'#60a5fa',borderRadius:4,borderSkipped:false},
-    {label:'Over SLA',data:recs.map(r=>d.filter(x=>x.recruiter===r&&x.status==='Open'&&x.daysOver>0).length),backgroundColor:'#f87171',borderRadius:4,borderSkipped:false}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:Gg.ticks},y:{grid:Gg.grid,ticks:{...Gg.ticks,stepSize:1}}}}});
-
-  const avgs=recs.map(r=>{const rs=d.filter(x=>x.recruiter===r);return rs.length?Math.round(rs.reduce((s,x)=>s+x.days,0)/rs.length):0;});
-  mk('cAvgDays',{type:'bar',data:{labels:recs,datasets:[{data:avgs,backgroundColor:avgs.map(v=>v>60?'#f87171':v>45?'#fbbf24':'#4ade9a'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:Gg.grid,ticks:Gg.ticks},y:{grid:{display:false},ticks:Gg.ticks}}}});
-
-  const open=d.filter(r=>r.status==='Open').sort((a,b)=>b.daysOver-a.daysOver).slice(0,10);
-  document.getElementById('slaRows').innerHTML=open.map(r=>{const o=r.daysOver,f=o>30?'#f87171':o>0?'#fbbf24':'#4ade9a',p=Math.min(100,Math.round(r.days/r.sla*100));return`<div class="sla-row"><div class="sla-pos">${r.pos}</div><div class="sla-rec">${r.recruiter}</div><div class="sla-num" style="color:${f}">${r.days}</div><div class="sla-bar"><div class="sla-fill" style="width:${p}%;background:${f}"></div></div>${o>0?`<span class="badge badge-red">+${o}d</span>`:'<span class="badge badge-green">OK</span>'}</div>`;}).join('');
+  mk('cCap',{type:'bar',data:{labels:recSet,datasets:[{label:'Open',data:recSet.map(r=>d.filter(x=>x.recruiter===r&&x.status==='Open').length),backgroundColor:'#60a5fa',borderRadius:4,borderSkipped:false},{label:'Over SLA',data:recSet.map(r=>d.filter(x=>x.recruiter===r&&x.status==='Open'&&x.daysOver>0).length),backgroundColor:'#f87171',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:GG.ticks},y:{grid:GG.grid,ticks:{...GG.ticks,stepSize:1}}}}});
+  const avgs=recSet.map(r=>{const rs=d.filter(x=>x.recruiter===r);return rs.length?Math.round(rs.reduce((s,x)=>s+x.days,0)/rs.length):0;});
+  mk('cAvg',{type:'bar',data:{labels:recSet,datasets:[{data:avgs,backgroundColor:avgs.map(v=>v>60?'#f87171':v>45?'#fbbf24':'#4ade9a'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:GG.grid,ticks:GG.ticks},y:{grid:{display:false},ticks:GG.ticks}}}});
+  const openR=d.filter(r=>r.status==='Open').sort((a,b)=>b.daysOver-a.daysOver).slice(0,10);
+  document.getElementById('sla-rows').innerHTML=openR.map(r=>{const o=r.daysOver,f=o>30?'#f87171':o>0?'#fbbf24':'#4ade9a',p=Math.min(100,Math.round(r.days/r.sla*100));return`<div class="sla-row"><div class="sp">${r.pos}</div><div class="sr">${r.recruiter}</div><div class="sn" style="color:${f}">${r.days}</div><div class="sb2"><div class="sf" style="width:${p}%;background:${f}"></div></div>${o>0?`<span class="bdg br">+${o}d</span>`:'<span class="bdg bg">OK</span>'}</div>`;}).join('');
 }
 
+/* ── MONDAY ── */
 function renderMonday(){
-  const d=gd(),open=d.filter(r=>r.status==='Open'),closed=d.filter(r=>r.status==='Closed'),paused=d.filter(r=>r.status==='Paused');
-  const over=open.filter(r=>r.daysOver>0),avgF=closed.length?(closed.reduce((s,r)=>s+r.days,0)/closed.length).toFixed(1):'—';
-  document.getElementById('monMetrics').innerHTML=`
-    <div class="mcard c-blue"><div class="mcard-label">Open positions</div><div class="mcard-value">${open.length}</div><div class="mcard-sub">Active</div></div>
-    <div class="mcard c-purple"><div class="mcard-label">Paused</div><div class="mcard-value">${paused.length}</div><div class="mcard-sub">On hold</div></div>
-    <div class="mcard c-red"><div class="mcard-label">Over SLA</div><div class="mcard-value warn">${over.length}</div><div class="mcard-sub">${open.length?Math.round(over.length/open.length*100):0}%</div></div>
-    <div class="mcard c-green"><div class="mcard-label">Closed ≤30d</div><div class="mcard-value ok">${closed.filter(r=>r.days<=30).length}</div><div class="mcard-sub">This month</div></div>
-    <div class="mcard c-amber"><div class="mcard-label">Avg days to fill</div><div class="mcard-value">${avgF}</div><div class="mcard-sub">Closed roles</div></div>`;
-  document.getElementById('atRiskTbody').innerHTML=[...over].sort((a,b)=>b.daysOver-a.daysOver).map((r,i)=>{const o=r.daysOver,cls=o>50?'days-red':o>25?'days-amber':'days-green';return`<tr><td style="color:#4b5563">${i+1}</td><td class="td-pos">${r.pos}</td><td>${r.company}</td><td>${r.recruiter}</td><td style="font-weight:600">${r.days}</td><td><span class="days-cell ${cls}">${o}</span></td><td>${r.hm}</td></tr>`;}).join('');
-  const rc=closed.slice(0,10);
-  mk('cClosedWeek',{type:'bar',data:{labels:rc.length?rc.map(r=>r.pos.slice(0,14)+'…'):['None'],datasets:[{data:rc.length?rc.map(r=>r.days):[0],backgroundColor:'#2dd4bf',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:Gg.grid,ticks:Gg.ticks},x:{grid:{display:false},ticks:{...Gg.ticks,maxRotation:35}}}}});
-  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const d=gd();
+  const open=d.filter(r=>r.status==='Open'),closed=d.filter(r=>r.status==='Closed'),paused=d.filter(r=>r.status==='Paused');
+  const over=open.filter(r=>r.daysOver>0);
+  const avgF=closed.length?(closed.reduce((s,r)=>s+r.days,0)/closed.length).toFixed(1):'—';
+  document.getElementById('mon-metrics').innerHTML=`
+    <div class="mc bl"><div class="mc-lbl">Open positions</div><div class="mc-val">${open.length}</div><div class="mc-sub">Active</div></div>
+    <div class="mc pu"><div class="mc-lbl">Paused</div><div class="mc-val">${paused.length}</div><div class="mc-sub">On hold</div></div>
+    <div class="mc rd"><div class="mc-lbl">Over SLA</div><div class="mc-val warn">${over.length}</div><div class="mc-sub">${open.length?Math.round(over.length/open.length*100):0}%</div></div>
+    <div class="mc gn"><div class="mc-lbl">Closed ≤30d</div><div class="mc-val ok">${closed.filter(r=>r.days<=30).length}</div><div class="mc-sub">This period</div></div>
+    <div class="mc am"><div class="mc-lbl">Avg days to fill</div><div class="mc-val">${avgF}</div><div class="mc-sub">Closed roles</div></div>`;
+
+  document.getElementById('risk-tbody').innerHTML=[...over].sort((a,b)=>b.daysOver-a.daysOver).map((r,i)=>{const o=r.daysOver,cl=o>50?'dr':o>25?'da':'dg';return`<tr><td style="color:#4b5563">${i+1}</td><td class="tdp">${r.pos}</td><td>${r.company}</td><td>${r.recruiter}</td><td style="font-weight:600">${r.days}</td><td><span class="dc ${cl}">${o}</span></td><td>${r.hm}</td></tr>`;}).join('');
+
+  // Recently closed — sorted by closedDate desc
+  const rc=[...closed].filter(r=>r.closedDate).sort((a,b)=>new Date(b.closedDate)-new Date(a.closedDate)).slice(0,10);
+  const rcLabels=rc.map(r=>{const dt=new Date(r.closedDate);return(r.pos.length>14?r.pos.slice(0,14)+'…':r.pos)+(isNaN(dt)?'':` (${dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})})`)});
+  mk('cRecent',{type:'bar',data:{labels:rc.length?rcLabels:['No closed roles'],datasets:[{data:rc.length?rc.map(r=>r.days):[0],backgroundColor:rc.map((_,i)=>`hsl(${160+i*10},65%,55%)`),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>rc[i[0].dataIndex]?.pos||'',label:i=>{const r=rc[i.dataIndex];return r?[`Days to fill: ${r.days}`,`Closed: ${new Date(r.closedDate).toLocaleDateString()}`,`Recruiter: ${r.recruiter}`]:[];}}}},scales:{y:{grid:GG.grid,ticks:GG.ticks,title:{display:true,text:'Days to fill',color:'#6b7280',font:{size:10}}},x:{grid:{display:false},ticks:{...GG.ticks,maxRotation:40}}}}});
+
+  // Monthly benchmarks
   const now=new Date();
-  // Build last 6 active months dynamically
-  const monthLabels=[];
-  for(let i=5;i>=0;i--){
-    const d2=new Date(now.getFullYear(),now.getMonth()-i,1);
-    monthLabels.push(months[d2.getMonth()]+' '+String(d2.getFullYear()).slice(2));
-  }
-  function getMonthKey(dateStr){
-    if(!dateStr) return null;
-    const d2=new Date(dateStr);
-    if(isNaN(d2)) return null;
-    return months[d2.getMonth()]+' '+String(d2.getFullYear()).slice(2);
-  }
-  const mC=monthLabels.map(m=>closed.filter(r=>getMonthKey(r.closedDate)===m).length);
-  const mO=monthLabels.map(m=>d.filter(r=>getMonthKey(r.openDate)===m).length);
-  const mP=monthLabels.map(m=>paused.filter(r=>getMonthKey(r.openDate)===m).length);
-  const mT=monthLabels.map(m=>{
-    const rs=closed.filter(r=>getMonthKey(r.closedDate)===m&&r.days>0);
-    return rs.length?Math.round(rs.reduce((s,r)=>s+r.days,0)/rs.length):null;
-  });
-  mk('cTtf',{type:'line',data:{labels:months,datasets:[{label:'Avg TTF',data:mT,borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,0.08)',tension:.35,pointRadius:4,fill:true,spanGaps:true},{label:'SLA (45)',data:months.map(()=>45),borderColor:'#f87171',borderDash:[6,4],pointRadius:0,borderWidth:1.5,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},color:'#9ca3af',usePointStyle:true}}},scales:{y:{grid:Gg.grid,ticks:Gg.ticks,min:0},x:{grid:{display:false},ticks:Gg.ticks}}}});
-  mk('cMovement',{type:'line',data:{labels:months,datasets:[{label:'Opened',data:mO,borderColor:'#a78bfa',tension:.35,pointRadius:4,fill:false},{label:'Closed',data:mC,borderColor:'#4ade9a',tension:.35,pointRadius:4,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},color:'#9ca3af',usePointStyle:true}}},scales:{y:{grid:Gg.grid,ticks:Gg.ticks},x:{grid:{display:false},ticks:Gg.ticks}}}});
-  mk('cClosingRole',{type:'bar',data:{labels:['Full Time','Part Time','Advisor','Fractional'],datasets:[{data:['Full Time','Part Time','Advisor','Fractional'].map(t=>closed.filter(r=>r.roleType===t).length),backgroundColor:'#0d9488',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:Gg.grid,ticks:Gg.ticks},x:{grid:{display:false},ticks:Gg.ticks}}}});
-  mk('cOpenedVsClosed',{type:'bar',data:{labels:months,datasets:[{label:'Closed',data:mC,backgroundColor:'#ec4899',borderRadius:4,borderSkipped:false},{label:'Paused',data:mP,backgroundColor:'#0e7490',borderRadius:4,borderSkipped:false},{label:'Opened',data:mO,backgroundColor:'#38bdf8',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},color:'#9ca3af',usePointStyle:true,pointStyle:'rect'}}},scales:{x:{grid:{display:false},ticks:Gg.ticks},y:{grid:Gg.grid,ticks:Gg.ticks}}}});
+  const mLabels=[],mKeys=[];
+  for(let i=5;i>=0;i--){const dt=new Date(now.getFullYear(),now.getMonth()-i,1);mLabels.push(['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]+' '+String(dt.getFullYear()).slice(2));mKeys.push(`${dt.getFullYear()}-${dt.getMonth()}`);}
+  function mKey(ds){if(!ds)return null;const dt=new Date(ds);return isNaN(dt)?null:`${dt.getFullYear()}-${dt.getMonth()}`;}
+  const mC=mKeys.map(k=>closed.filter(r=>mKey(r.closedDate)===k).length);
+  const mO=mKeys.map(k=>d.filter(r=>mKey(r.openDate)===k).length);
+  const mP=mKeys.map(k=>paused.filter(r=>mKey(r.openDate)===k).length);
+  const mT=mKeys.map(k=>{const rs=closed.filter(r=>mKey(r.closedDate)===k&&r.days>0);return rs.length?Math.round(rs.reduce((s,r)=>s+r.days,0)/rs.length):null;});
+
+  mk('cTtf',{type:'line',data:{labels:mLabels,datasets:[{label:'Avg TTF',data:mT,borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,0.08)',tension:.35,pointRadius:4,fill:true,spanGaps:true},{label:'SLA (45)',data:mLabels.map(()=>45),borderColor:'#f87171',borderDash:[6,4],pointRadius:0,borderWidth:1.5,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},color:'#9ca3af',usePointStyle:true}}},scales:{y:{grid:GG.grid,ticks:GG.ticks,min:0},x:{grid:{display:false},ticks:GG.ticks}}}});
+  mk('cMove',{type:'line',data:{labels:mLabels,datasets:[{label:'Opened',data:mO,borderColor:'#a78bfa',tension:.35,pointRadius:4,fill:false},{label:'Closed',data:mC,borderColor:'#4ade9a',tension:.35,pointRadius:4,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},color:'#9ca3af',usePointStyle:true}}},scales:{y:{grid:GG.grid,ticks:GG.ticks},x:{grid:{display:false},ticks:GG.ticks}}}});
+  const rtypes=['Full Time','Part Time','Advisor','Fractional'];
+  mk('cCRT',{type:'bar',data:{labels:rtypes,datasets:[{data:rtypes.map(t=>closed.filter(r=>r.roleType===t).length),backgroundColor:'#0d9488',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:GG.grid,ticks:GG.ticks},x:{grid:{display:false},ticks:GG.ticks}}}});
+  mk('cOvC',{type:'bar',data:{labels:mLabels,datasets:[{label:'Closed',data:mC,backgroundColor:'#ec4899',borderRadius:4,borderSkipped:false},{label:'Paused',data:mP,backgroundColor:'#0e7490',borderRadius:4,borderSkipped:false},{label:'Opened',data:mO,backgroundColor:'#38bdf8',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},color:'#9ca3af',usePointStyle:true,pointStyle:'rect'}}},scales:{x:{grid:{display:false},ticks:GG.ticks},y:{grid:GG.grid,ticks:GG.ticks}}}});
 }
 
-function goPage(n,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+n).classList.add('active');el.classList.add('active');document.getElementById('topbar-title').textContent={overview:'Top Level Overview',pipeline:'Pipeline Health',capacity:'Team Capacity',monday:'Monday Review'}[n];setTimeout(()=>Object.values(ci).forEach(c=>{try{c.resize()}catch(e){}}),50);}
-function setOvFilter(el,v){document.querySelectorAll('#overSlaChips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');pF.ov=v;renderPipeline();}
-document.getElementById('pfStatus').addEventListener('change',function(){pF.status=this.value;renderPipeline();});
-document.getElementById('pfRoleType').addEventListener('change',function(){pF.roleType=this.value;renderPipeline();});
-function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');setTimeout(()=>Object.values(ci).forEach(c=>{try{c.resize()}catch(e){}}),300);}
+/* ── NAV ── */
+function goPage(n,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+n).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('tb-title').textContent={overview:'Top Level Overview',pipeline:'Pipeline Health',capacity:'Team Capacity',monday:'Monday Review'}[n];
+  setTimeout(()=>Object.values(CI).forEach(c=>{try{c.resize()}catch(e){}}),50);
+}
+function setOv(el,v){document.querySelectorAll('#ov-chips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');PF.ov=v;renderPipeline();}
+document.getElementById('pStatus').addEventListener('change',function(){PF.status=this.value;renderPipeline();});
+document.getElementById('pRoleType').addEventListener('change',function(){PF.roleType=this.value;renderPipeline();});
+
 setInterval(loadData,5*60*1000);
 loadData();
 </script>
