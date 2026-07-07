@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,14 +9,14 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;font-size:14px;display:flex;height:100vh;overflow:hidden}
-.sidebar{width:220px;min-width:220px;background:#0d1120;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;transition:width .25s;overflow:hidden}
+.sidebar{width:240px;min-width:240px;background:#0d1120;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;transition:width .25s;overflow:hidden}
 .sidebar.collapsed{width:60px;min-width:60px}
 .sb-header{padding:18px 14px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px}
 .sb-logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#4ade9a,#2563eb);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
 .sb-brand{font-size:13px;font-weight:700;color:#fff;white-space:nowrap}
-.sidebar.collapsed .sb-brand,.sidebar.collapsed .sb-sub,.sidebar.collapsed .nav-label,.sidebar.collapsed .nav-badge,.sidebar.collapsed .sb-sec,.sidebar.collapsed .sb-filters{opacity:0;pointer-events:none}
 .sb-sub{font-size:10px;color:#4b5563;white-space:nowrap}
-.nav{flex:1;padding:10px 8px;overflow-y:auto}
+.sidebar.collapsed .sb-brand,.sidebar.collapsed .sb-sub,.sidebar.collapsed .nav-label,.sidebar.collapsed .nav-badge,.sidebar.collapsed .sb-sec,.sidebar.collapsed .sb-filters{opacity:0;pointer-events:none}
+.nav{padding:10px 8px}
 .sb-sec{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#374151;padding:8px 8px 4px;white-space:nowrap}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;transition:background .15s}
 .nav-item:hover{background:rgba(255,255,255,.05)}
@@ -27,16 +28,18 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
 .nav-label{font-size:13px;color:#9ca3af;white-space:nowrap}
 .nav-item.active .nav-label{color:#4ade9a;font-weight:600}
 .nav-badge{margin-left:auto;background:rgba(248,113,113,.2);color:#f87171;font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;flex-shrink:0}
-.sb-filters{padding:0 8px 8px}
-.flt-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#374151;margin:10px 0 4px}
+.sb-filters{padding:0 10px 10px;flex:1;overflow-y:auto}
+.flt-lbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#4b5563;margin:10px 0 4px}
 .fsel{width:100%;background:#111827;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#9ca3af;padding:7px 10px;font-size:12px;font-family:inherit;cursor:pointer;outline:none;margin-bottom:6px}
 .fsel:hover{border-color:rgba(255,255,255,.2)}
-.sb-foot{padding:10px 8px;border-top:1px solid rgba(255,255,255,.06)}
+.custom-dates{margin-top:2px}
+.dt-lbl{font-size:10px;color:#4b5563;margin-bottom:3px}
+.sb-foot{padding:10px 8px;border-top:1px solid rgba(255,255,255,.06);margin-top:auto}
 .col-btn{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;color:#6b7280;font-size:12px}
 .col-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0;transition:transform .3s}
 .sidebar.collapsed .col-btn svg{transform:rotate(180deg)}
-.col-label{white-space:nowrap}
-.sidebar.collapsed .col-label{opacity:0}
+.col-lbl{white-space:nowrap}
+.sidebar.collapsed .col-lbl{opacity:0}
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-width:0}
 .topbar{padding:14px 28px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;background:#0a0e1a;position:sticky;top:0;z-index:10}
 .tb-title{font-size:16px;font-weight:600;color:#fff}
@@ -91,8 +94,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
 .dg{background:rgba(74,222,154,.15);color:#6ee7b7}
 .bdg{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
 .br{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.2)}
-.bg{background:rgba(74,222,154,.12);color:#4ade9a;border:1px solid rgba(74,222,154,.18)}
-.ba{background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.18)}
+.bg2{background:rgba(74,222,154,.12);color:#4ade9a;border:1px solid rgba(74,222,154,.18)}
 .rec-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
 .rc{background:#111827;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px 20px}
 .rav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-bottom:12px}
@@ -105,7 +107,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
 .sla-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
 .sla-row:last-child{border-bottom:none}
 .sp{flex:1;font-size:12px;font-weight:500;color:#e5e7eb;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sr{font-size:11px;color:#6b7280;min-width:48px}
+.sr2{font-size:11px;color:#6b7280;min-width:48px}
 .sn{font-size:13px;font-weight:700;min-width:30px;text-align:right}
 .sb2{flex:1;max-width:80px;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
 .sf{height:100%;border-radius:2px}
@@ -140,26 +142,37 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
   </nav>
   <div class="sb-filters">
     <div class="sb-sec">Filters</div>
+    <div class="flt-lbl">Company</div>
     <select class="fsel" id="gCompany" onchange="applyG()">
       <option value="All">All companies</option>
       <option value="MoonTech">MoonTech</option>
       <option value="ITCAN">ITCAN</option>
     </select>
+    <div class="flt-lbl">Recruiter</div>
     <select class="fsel" id="gRecruiter" onchange="applyG()"><option value="All">All recruiters</option></select>
+    <div class="flt-lbl">Department</div>
     <select class="fsel" id="gDept" onchange="applyG()"><option value="All">All departments</option></select>
-    <select class="fsel" id="gDate" onchange="applyG()">
+    <div class="flt-lbl">Date range</div>
+    <select class="fsel" id="gDate" onchange="handleDateChange()">
       <option value="All">All time</option>
       <option value="30">Last 30 days</option>
       <option value="60">Last 60 days</option>
       <option value="90">Last 90 days</option>
       <option value="180">Last 6 months</option>
       <option value="365">Last 12 months</option>
+      <option value="custom">Custom range...</option>
     </select>
+    <div id="customDates" style="display:none" class="custom-dates">
+      <div class="dt-lbl">From</div>
+      <input type="date" id="gDateFrom" class="fsel" onchange="applyG()">
+      <div class="dt-lbl">To</div>
+      <input type="date" id="gDateTo" class="fsel" onchange="applyG()">
+    </div>
   </div>
   <div class="sb-foot">
     <div class="col-btn" onclick="document.getElementById('sidebar').classList.toggle('collapsed');setTimeout(()=>Object.values(CI).forEach(c=>{try{c.resize()}catch(e){}}),300)">
       <svg viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
-      <span class="col-label">Collapse</span>
+      <span class="col-lbl">Collapse</span>
     </div>
   </div>
 </div>
@@ -180,7 +193,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
     <div id="g-error" style="display:none"></div>
     <div id="g-pages" style="display:none">
 
-      <!-- OVERVIEW -->
       <div class="page active" id="page-overview">
         <div class="metrics" id="m-row"></div>
         <div class="type-cards" id="t-cards"></div>
@@ -192,7 +204,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
         </div>
       </div>
 
-      <!-- PIPELINE -->
       <div class="page" id="page-pipeline">
         <div class="filters">
           <select class="fsel2" id="pStatus" onchange="renderPipeline()">
@@ -222,7 +233,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
         </div>
       </div>
 
-      <!-- CAPACITY -->
       <div class="page" id="page-capacity">
         <div class="rec-cards" id="r-cards"></div>
         <div class="g2">
@@ -233,7 +243,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
         <div class="card"><h3>Top 10 by urgency</h3><div id="sla-rows"></div></div>
       </div>
 
-      <!-- MONDAY -->
       <div class="page" id="page-monday">
         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px" id="mon-metrics"></div>
         <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:14px;margin-bottom:20px">
@@ -267,109 +276,62 @@ Chart.defaults.borderColor='rgba(255,255,255,0.05)';
 const API='https://script.google.com/macros/s/AKfycbxzs7qdrJK93WwHBKnQ2RN8aWcr9-EbAmSIYitoEiUQAiMu2sSRw6hIDhrWsTDgUz3X6A/exec';
 const GG={grid:{color:'rgba(255,255,255,0.05)'},ticks:{font:{size:11},color:'#6b7280'}};
 let RAW=[], CI={};
-let GF={company:'All',recruiter:'All',dept:'All',date:'All'};
+let GF={company:'All',recruiter:'All',dept:'All',date:'All',dateFrom:'',dateTo:''};
 let PF={status:'Open',roleType:'All',ov:'All'};
 
-/* ── LOAD ── */
-async function loadData(){
-  show('g-loading');hide('g-error');hide('g-pages');
-  try{
-    const res=await fetch(API);
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const json=await res.json();
-    if(!Array.isArray(json)||!json.length) throw new Error('No data returned');
-    RAW=json.map(parseRow).filter(r=>r.pos);
-    // populate dropdowns
-    const recs=[...new Set(RAW.map(r=>r.recruiter).filter(r=>r&&r!=='Other'))].sort();
-    setOpts('gRecruiter','All recruiters',recs);
-    const depts=[...new Set(RAW.map(r=>r.dept).filter(d=>d))].sort();
-    setOpts('gDept','All departments',depts);
-    hide('g-loading');show('g-pages');
-    document.getElementById('tb-time').textContent='Live · '+new Date().toLocaleTimeString();
-    renderAll();
-  }catch(e){
-    hide('g-loading');show('g-error');
-    document.getElementById('g-error').innerHTML=`<div class="err-box">❌ ${e.message}</div>`;
-  }
-}
-
-function parseRow(r){
-  // recruiter
-  const rec=String(r.Recruiter||'');
-  const rl=rec.toLowerCase();
-  const recruiter=rl.includes('jabaseh')||rl.includes('nour j')?'Nour J':
-                  rl.includes('mokhtar')||rl.includes('nour m')?'Nour M':
-                  rl.includes('aju')?'Aju':rec||'Other';
-  // status
-  const sl=String(r.Status||'').toLowerCase();
-  const status=sl.includes('open')?'Open':sl.includes('closed')?'Closed':
-               (sl.includes('pause')||sl.includes('cancel')||sl.includes('direction'))?'Paused':'Other';
-  // role type
-  const rawRT=String(r.Role_Type||'').trim();
-  const rtl=rawRT.toLowerCase();
-  const roleType=rtl.includes('full')||rtl==='ft'?'Full Time':
-                 rtl.includes('part')||rtl==='pt'?'Part Time':
-                 rtl.includes('adv')?'Advisor':
-                 rtl.includes('frac')?'Fractional':
-                 rawRT||'Full Time';
-  // priority normalise
-  const rawP=String(r.Priority||'').trim();
-  const pl=rawP.toLowerCase();
-  const priority=pl.includes('urgent')?'Urgent':
-                 pl.includes('high')?'High':
-                 pl.includes('medium')?'Medium':
-                 pl.includes('low')?'Low':
-                 pl.includes('pause')||pl.includes('cancel')?'Paused':rawP;
-  const days=parseInt(r.Days_Open)||0;
-  const sla=parseInt(r.SLA_Days)||45;
-  return{
-    pos:     String(r.Position||'').trim(),
-    company: String(r.Company||'').trim(),
-    dept:    String(r.Department||'').trim(),
-    recruiter,status,roleType,priority,
-    posType: String(r.Position_Type||'').trim(),
-    days,sla,
-    daysOver:parseInt(r.Days_Over_SLA)||Math.max(0,days-sla),
-    stage:   String(r.Stage||'').trim(),
-    budget:  parseInt(String(r.Budget_AED||'').replace(/[^0-9]/g,''))||0,
-    cat:     String(r['Budget category']||r.Budget_category||'').trim(),
-    hm:      String(r.Hiring_Manager||'').trim(),
-    openDate:String(r.Open_Date||'').trim(),
-    closedDate:String(r.Closed_Date||'').trim(),
-  };
-}
-
-function setOpts(id,all,vals){
+/* ══ HELPERS ══ */
+function show(id){document.getElementById(id).style.display='';}
+function hide(id){document.getElementById(id).style.display='none';}
+function setOpts(id,allLabel,vals){
   const s=document.getElementById(id);
-  s.innerHTML=`<option value="All">${all}</option>`+vals.map(v=>`<option value="${v}">${v}</option>`).join('');
+  s.innerHTML=`<option value="All">${allLabel}</option>`+vals.map(v=>`<option value="${v}">${v}</option>`).join('');
 }
-function show(id){document.getElementById(id).style.display=''}
-function hide(id){document.getElementById(id).style.display='none'}
 
-/* ── FILTER ── */
-function applyG(){
-  GF.company=document.getElementById('gCompany').value;
-  GF.recruiter=document.getElementById('gRecruiter').value;
-  GF.dept=document.getElementById('gDept').value;
-  GF.date=document.getElementById('gDate').value;
-  renderAll();
+/* ══ DATE RANGE ══ */
+function getDateRange(){
+  if(GF.date==='custom'){
+    const from=GF.dateFrom?new Date(GF.dateFrom):null;
+    const to=GF.dateTo?new Date(new Date(GF.dateTo).setHours(23,59,59,999)):null;
+    let label='Custom';
+    if(GF.dateFrom&&GF.dateTo) label=`${GF.dateFrom} → ${GF.dateTo}`;
+    else if(GF.dateFrom) label=`From ${GF.dateFrom}`;
+    else if(GF.dateTo) label=`To ${GF.dateTo}`;
+    return{from,to,label};
+  }
+  if(GF.date==='All') return{from:null,to:null,label:'All time'};
+  const from=new Date(Date.now()-parseInt(GF.date)*86400000);
+  const labels={30:'Last 30d',60:'Last 60d',90:'Last 90d',180:'Last 6mo',365:'Last 12mo'};
+  return{from,to:null,label:labels[GF.date]||`Last ${GF.date}d`};
+}
+
+function inRange(dateStr,from,to){
+  if(!dateStr) return false;
+  const d=new Date(dateStr);
+  if(isNaN(d)) return false;
+  if(from&&d<from) return false;
+  if(to&&d>to) return false;
+  return true;
+}
+
+/* ══ FILTER ══ */
+function baseFilter(r){
+  if(GF.company!=='All'&&r.company!==GF.company) return false;
+  if(GF.recruiter!=='All'&&r.recruiter!==GF.recruiter) return false;
+  if(GF.dept!=='All'&&r.dept!==GF.dept) return false;
+  return true;
 }
 
 function gd(){
-  const cutoff=GF.date!=='All'?new Date(Date.now()-parseInt(GF.date)*86400000):null;
+  const{from,to}=getDateRange();
   return RAW.filter(r=>{
-    if(GF.company!=='All'&&r.company!==GF.company) return false;
-    if(GF.recruiter!=='All'&&r.recruiter!==GF.recruiter) return false;
-    if(GF.dept!=='All'&&r.dept!==GF.dept) return false;
-    if(!cutoff) return true;
-    // Open/Paused — always show (currently live)
+    if(!baseFilter(r)) return false;
+    if(!from&&!to) return true;
+    // Open/Paused — always include (currently live)
     if(r.status==='Open'||r.status==='Paused') return true;
-    // Closed — filter by closed date
+    // Closed — filter by closed date, fallback to open date
     if(r.status==='Closed'){
-      const cd=r.closedDate?new Date(r.closedDate):null;
-      if(cd&&!isNaN(cd)) return cd>=cutoff;
-      const od=r.openDate?new Date(r.openDate):null;
-      return od&&!isNaN(od)&&od>=cutoff;
+      if(r.closedDate&&inRange(r.closedDate,from,to)) return true;
+      return inRange(r.openDate,from,to);
     }
     return true;
   });
@@ -385,14 +347,93 @@ function pd(){
   });
 }
 
-/* ── CHART HELPER ── */
-function mk(id,cfg){
-  if(CI[id]) CI[id].destroy();
-  const el=document.getElementById(id);
-  if(el) CI[id]=new Chart(el,cfg);
+/* ══ PARSE ROW ══ */
+function parseRow(r){
+  const rec=String(r.Recruiter||'');
+  const rl=rec.toLowerCase();
+  const recruiter=rl.includes('jabaseh')||rl.includes('nour j')?'Nour J':
+                  rl.includes('mokhtar')||rl.includes('nour m')?'Nour M':
+                  rl.includes('aju')?'Aju':rec||'Other';
+  const sl=String(r.Status||'').toLowerCase();
+  const status=sl.includes('open')?'Open':sl.includes('closed')?'Closed':
+               (sl.includes('pause')||sl.includes('cancel')||sl.includes('direction'))?'Paused':'Other';
+  const rawRT=String(r.Role_Type||'').trim();
+  const rtl=rawRT.toLowerCase();
+  const roleType=rtl.includes('full')||rtl==='ft'?'Full Time':
+                 rtl.includes('part')||rtl==='pt'?'Part Time':
+                 rtl.includes('adv')?'Advisor':
+                 rtl.includes('frac')?'Fractional':rawRT||'Full Time';
+  const rawP=String(r.Priority||'').trim();
+  const pl=rawP.toLowerCase();
+  const priority=pl.includes('urgent')?'Urgent':pl.includes('high')?'High':
+                 pl.includes('medium')?'Medium':pl.includes('low')?'Low':
+                 (pl.includes('pause')||pl.includes('cancel'))?'Paused':rawP;
+  const days=parseInt(r.Days_Open)||0;
+  const sla=parseInt(r.SLA_Days)||45;
+  return{
+    pos:String(r.Position||'').trim(),
+    company:String(r.Company||'').trim(),
+    dept:String(r.Department||'').trim(),
+    recruiter,status,roleType,priority,
+    posType:String(r.Position_Type||'').trim(),
+    days,sla,
+    daysOver:parseInt(r.Days_Over_SLA)||Math.max(0,days-sla),
+    stage:String(r.Stage||'').trim(),
+    budget:parseInt(String(r.Budget_AED||'').replace(/[^0-9]/g,''))||0,
+    cat:String(r['Budget category']||r.Budget_category||'').trim(),
+    hm:String(r.Hiring_Manager||'').trim(),
+    openDate:String(r.Open_Date||'').trim(),
+    closedDate:String(r.Closed_Date||'').trim(),
+  };
 }
 
-/* ── RENDER ALL ── */
+/* ══ LOAD ══ */
+async function loadData(){
+  show('g-loading');hide('g-error');hide('g-pages');
+  try{
+    const res=await fetch(API);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const json=await res.json();
+    if(!Array.isArray(json)||!json.length) throw new Error('No data returned');
+    RAW=json.map(parseRow).filter(r=>r.pos);
+    const recs=[...new Set(RAW.map(r=>r.recruiter).filter(r=>r&&r!=='Other'))].sort();
+    setOpts('gRecruiter','All recruiters',recs);
+    const depts=[...new Set(RAW.map(r=>r.dept).filter(d=>d))].sort();
+    setOpts('gDept','All departments',depts);
+    hide('g-loading');show('g-pages');
+    document.getElementById('tb-time').textContent='Live · '+new Date().toLocaleTimeString();
+    renderAll();
+  }catch(e){
+    hide('g-loading');show('g-error');
+    document.getElementById('g-error').innerHTML=`<div class="err-box">❌ ${e.message}</div>`;
+  }
+}
+
+/* ══ APPLY FILTERS ══ */
+function handleDateChange(){
+  const v=document.getElementById('gDate').value;
+  document.getElementById('customDates').style.display=v==='custom'?'block':'none';
+  GF.date=v;
+  if(v!=='custom') renderAll();
+}
+function applyG(){
+  GF.company=document.getElementById('gCompany').value;
+  GF.recruiter=document.getElementById('gRecruiter').value;
+  GF.dept=document.getElementById('gDept').value;
+  GF.date=document.getElementById('gDate').value;
+  GF.dateFrom=document.getElementById('gDateFrom').value||'';
+  GF.dateTo=document.getElementById('gDateTo').value||'';
+  renderAll();
+}
+
+/* ══ CHART HELPER ══ */
+function mk(id,cfg){
+  if(CI[id])CI[id].destroy();
+  const el=document.getElementById(id);
+  if(el)CI[id]=new Chart(el,cfg);
+}
+
+/* ══ RENDER ALL ══ */
 function renderAll(){
   renderOverview();
   renderPipeline();
@@ -401,7 +442,7 @@ function renderAll(){
   document.getElementById('sla-badge').textContent=gd().filter(r=>r.status==='Open'&&r.daysOver>0).length;
 }
 
-/* ── OVERVIEW ── */
+/* ══ OVERVIEW ══ */
 function renderOverview(){
   const d=gd();
   const open=d.filter(r=>r.status==='Open');
@@ -409,23 +450,29 @@ function renderOverview(){
   const paused=d.filter(r=>r.status==='Paused');
   const overSla=open.filter(r=>r.daysOver>0);
   const avgC=closed.length?Math.round(closed.reduce((s,r)=>s+r.days,0)/closed.length):0;
-  const avgO=open.length?Math.round(open.reduce((s,r)=>s+r.days,0)/open.length):0;
   const rate=d.length?Math.round(closed.length/d.length*100):0;
+  const{from,to,label:dateLabel}=getDateRange();
+
+  // Total opened in selected window
+  const totalOpened=RAW.filter(r=>{
+    if(!baseFilter(r)) return false;
+    if(!from&&!to) return true;
+    return inRange(r.openDate,from,to);
+  }).length;
 
   document.getElementById('m-row').innerHTML=`
-    <div class="mc bl"><div class="mc-lbl">Open positions</div><div class="mc-val">${open.length}</div><div class="mc-sub">Active pipeline</div></div>
-    <div class="mc rd"><div class="mc-lbl">Roles over SLA</div><div class="mc-val warn">${overSla.length}</div><div class="mc-sub">${open.length?Math.round(overSla.length/open.length*100):0}% of open</div></div>
-    <div class="mc gn"><div class="mc-lbl">Closed (≤30d)</div><div class="mc-val ok">${closed.filter(r=>r.days<=30).length}</div><div class="mc-sub">Fast closes</div></div>
+    <div class="mc gn"><div class="mc-lbl">Active roles now</div><div class="mc-val ok">${open.length}</div><div class="mc-sub">Currently open</div></div>
+    <div class="mc tl"><div class="mc-lbl">Total opened · ${dateLabel}</div><div class="mc-val">${totalOpened}</div><div class="mc-sub">${open.length} active · ${Math.max(0,totalOpened-open.length)} closed/paused</div></div>
+    <div class="mc rd"><div class="mc-lbl">Roles over SLA</div><div class="mc-val warn">${overSla.length}</div><div class="mc-sub">${open.length?Math.round(overSla.length/open.length*100):0}% of active</div></div>
     <div class="mc am"><div class="mc-lbl">Avg days to close</div><div class="mc-val">${avgC}</div><div class="mc-sub">Target: 45 days</div></div>
-    <div class="mc tl"><div class="mc-lbl">Avg days open</div><div class="mc-val">${avgO}</div><div class="mc-sub">Current open roles</div></div>
+    <div class="mc bl"><div class="mc-lbl">Closed (≤30d)</div><div class="mc-val">${closed.filter(r=>r.days<=30).length}</div><div class="mc-sub">Fast closes</div></div>
     <div class="mc pu"><div class="mc-lbl">Paused / on hold</div><div class="mc-val">${paused.length}</div><div class="mc-sub">${rate}% closing rate</div></div>`;
 
   const types=['Full Time','Fractional','Advisor','Part Time'];
-  document.getElementById('t-cards').innerHTML=types.map(t=>`<div class="tc"><div class="tc-lbl">Open — ${t}</div><div class="tc-val">${open.filter(r=>r.roleType===t).length}</div></div>`).join('');
+  document.getElementById('t-cards').innerHTML=types.map(t=>`<div class="tc"><div class="tc-lbl">Active — ${t}</div><div class="tc-val">${open.filter(r=>r.roleType===t).length}</div></div>`).join('');
 
   mk('cStatus',{type:'bar',data:{labels:['Open','Closed','Paused'],datasets:[{data:[open.length,closed.length,paused.length],backgroundColor:['#60a5fa','#4ade9a','#fbbf24'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:GG.grid,ticks:GG.ticks},x:{grid:{display:false},ticks:GG.ticks}}}});
 
-  // Role type — with numbers on slices
   const rtTypes=['Full Time','Part Time','Advisor','Fractional'];
   const rtCounts=rtTypes.map(t=>d.filter(r=>r.roleType===t).length);
   mk('cRoleType',{type:'doughnut',
@@ -446,23 +493,21 @@ function renderOverview(){
       });
     }}]});
 
-  // Priority — open roles only, normalised
   const pLevels=['Urgent','High','Medium','Low','Paused'];
   const pColors=['#f87171','#fbbf24','#60a5fa','#4ade9a','#6b7280'];
-  const pCounts=pLevels.map(l=>open.filter(r=>r.priority===l).length);
-  mk('cPriority',{type:'bar',data:{labels:pLevels,datasets:[{data:pCounts,backgroundColor:pColors,borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:GG.grid,ticks:GG.ticks},x:{grid:{display:false},ticks:GG.ticks}}}});
+  mk('cPriority',{type:'bar',data:{labels:pLevels,datasets:[{data:pLevels.map(l=>open.filter(r=>r.priority===l).length),backgroundColor:pColors,borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:GG.grid,ticks:GG.ticks},x:{grid:{display:false},ticks:GG.ticks}}}});
 }
 
-/* ── PIPELINE ── */
+/* ══ PIPELINE ══ */
 function renderPipeline(){
   const d=[...pd()].sort((a,b)=>b.daysOver-a.daysOver);
   document.getElementById('p-tbody').innerHTML=d.map((r,i)=>{
     const o=r.daysOver,cl=o>30?'dr':o>0?'da':'dg';
-    return`<tr><td style="color:#4b5563">${i+1}</td><td class="tdp">${r.pos}</td><td>${r.company}</td><td>${r.recruiter}</td><td style="color:#9ca3af;max-width:120px;overflow:hidden;text-overflow:ellipsis">${r.stage}</td><td style="font-weight:600">${r.days}</td><td style="color:#6b7280">${r.sla}</td><td><span class="dc ${cl}">${o}</span></td><td>${o>0?'<span class="bdg br">Yes</span>':'<span class="bdg bg">No</span>'}</td><td>${r.hm}</td><td>${r.roleType}</td><td style="color:#9ca3af">${r.budget?r.budget.toLocaleString():'—'}</td><td style="font-size:11px;color:#6b7280">${r.cat}</td></tr>`;
+    return`<tr><td style="color:#4b5563">${i+1}</td><td class="tdp">${r.pos}</td><td>${r.company}</td><td>${r.recruiter}</td><td style="color:#9ca3af;max-width:120px;overflow:hidden;text-overflow:ellipsis">${r.stage}</td><td style="font-weight:600">${r.days}</td><td style="color:#6b7280">${r.sla}</td><td><span class="dc ${cl}">${o}</span></td><td>${o>0?'<span class="bdg br">Yes</span>':'<span class="bdg bg2">No</span>'}</td><td>${r.hm}</td><td>${r.roleType}</td><td style="color:#9ca3af">${r.budget?r.budget.toLocaleString():'—'}</td><td style="font-size:11px;color:#6b7280">${r.cat}</td></tr>`;
   }).join('');
 }
 
-/* ── CAPACITY ── */
+/* ══ CAPACITY ══ */
 function renderCapacity(){
   const d=gd();
   const recSet=[...new Set(d.map(r=>r.recruiter).filter(r=>r&&r!=='Other'))].sort();
@@ -475,30 +520,28 @@ function renderCapacity(){
   const avgs=recSet.map(r=>{const rs=d.filter(x=>x.recruiter===r);return rs.length?Math.round(rs.reduce((s,x)=>s+x.days,0)/rs.length):0;});
   mk('cAvg',{type:'bar',data:{labels:recSet,datasets:[{data:avgs,backgroundColor:avgs.map(v=>v>60?'#f87171':v>45?'#fbbf24':'#4ade9a'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:GG.grid,ticks:GG.ticks},y:{grid:{display:false},ticks:GG.ticks}}}});
   const openR=d.filter(r=>r.status==='Open').sort((a,b)=>b.daysOver-a.daysOver).slice(0,10);
-  document.getElementById('sla-rows').innerHTML=openR.map(r=>{const o=r.daysOver,f=o>30?'#f87171':o>0?'#fbbf24':'#4ade9a',p=Math.min(100,Math.round(r.days/r.sla*100));return`<div class="sla-row"><div class="sp">${r.pos}</div><div class="sr">${r.recruiter}</div><div class="sn" style="color:${f}">${r.days}</div><div class="sb2"><div class="sf" style="width:${p}%;background:${f}"></div></div>${o>0?`<span class="bdg br">+${o}d</span>`:'<span class="bdg bg">OK</span>'}</div>`;}).join('');
+  document.getElementById('sla-rows').innerHTML=openR.map(r=>{const o=r.daysOver,f=o>30?'#f87171':o>0?'#fbbf24':'#4ade9a',p=Math.min(100,Math.round(r.days/r.sla*100));return`<div class="sla-row"><div class="sp">${r.pos}</div><div class="sr2">${r.recruiter}</div><div class="sn" style="color:${f}">${r.days}</div><div class="sb2"><div class="sf" style="width:${p}%;background:${f}"></div></div>${o>0?`<span class="bdg br">+${o}d</span>`:'<span class="bdg bg2">OK</span>'}</div>`;}).join('');
 }
 
-/* ── MONDAY ── */
+/* ══ MONDAY ══ */
 function renderMonday(){
   const d=gd();
   const open=d.filter(r=>r.status==='Open'),closed=d.filter(r=>r.status==='Closed'),paused=d.filter(r=>r.status==='Paused');
   const over=open.filter(r=>r.daysOver>0);
   const avgF=closed.length?(closed.reduce((s,r)=>s+r.days,0)/closed.length).toFixed(1):'—';
   document.getElementById('mon-metrics').innerHTML=`
-    <div class="mc bl"><div class="mc-lbl">Open positions</div><div class="mc-val">${open.length}</div><div class="mc-sub">Active</div></div>
+    <div class="mc gn"><div class="mc-lbl">Active roles now</div><div class="mc-val ok">${open.length}</div><div class="mc-sub">Currently open</div></div>
     <div class="mc pu"><div class="mc-lbl">Paused</div><div class="mc-val">${paused.length}</div><div class="mc-sub">On hold</div></div>
     <div class="mc rd"><div class="mc-lbl">Over SLA</div><div class="mc-val warn">${over.length}</div><div class="mc-sub">${open.length?Math.round(over.length/open.length*100):0}%</div></div>
-    <div class="mc gn"><div class="mc-lbl">Closed ≤30d</div><div class="mc-val ok">${closed.filter(r=>r.days<=30).length}</div><div class="mc-sub">This period</div></div>
+    <div class="mc bl"><div class="mc-lbl">Closed ≤30d</div><div class="mc-val">${closed.filter(r=>r.days<=30).length}</div><div class="mc-sub">This period</div></div>
     <div class="mc am"><div class="mc-lbl">Avg days to fill</div><div class="mc-val">${avgF}</div><div class="mc-sub">Closed roles</div></div>`;
 
   document.getElementById('risk-tbody').innerHTML=[...over].sort((a,b)=>b.daysOver-a.daysOver).map((r,i)=>{const o=r.daysOver,cl=o>50?'dr':o>25?'da':'dg';return`<tr><td style="color:#4b5563">${i+1}</td><td class="tdp">${r.pos}</td><td>${r.company}</td><td>${r.recruiter}</td><td style="font-weight:600">${r.days}</td><td><span class="dc ${cl}">${o}</span></td><td>${r.hm}</td></tr>`;}).join('');
 
-  // Recently closed — sorted by closedDate desc
   const rc=[...closed].filter(r=>r.closedDate).sort((a,b)=>new Date(b.closedDate)-new Date(a.closedDate)).slice(0,10);
   const rcLabels=rc.map(r=>{const dt=new Date(r.closedDate);return(r.pos.length>14?r.pos.slice(0,14)+'…':r.pos)+(isNaN(dt)?'':` (${dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})})`)});
-  mk('cRecent',{type:'bar',data:{labels:rc.length?rcLabels:['No closed roles'],datasets:[{data:rc.length?rc.map(r=>r.days):[0],backgroundColor:rc.map((_,i)=>`hsl(${160+i*10},65%,55%)`),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>rc[i[0].dataIndex]?.pos||'',label:i=>{const r=rc[i.dataIndex];return r?[`Days to fill: ${r.days}`,`Closed: ${new Date(r.closedDate).toLocaleDateString()}`,`Recruiter: ${r.recruiter}`]:[];}}}},scales:{y:{grid:GG.grid,ticks:GG.ticks,title:{display:true,text:'Days to fill',color:'#6b7280',font:{size:10}}},x:{grid:{display:false},ticks:{...GG.ticks,maxRotation:40}}}}});
+  mk('cRecent',{type:'bar',data:{labels:rc.length?rcLabels:['No closed roles'],datasets:[{data:rc.length?rc.map(r=>r.days):[0],backgroundColor:rc.map((_,i)=>`hsl(${160+i*10},65%,55%)`),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>rc[i[0].dataIndex]?.pos||'',label:i=>{const r=rc[i.dataIndex];return r?[`Days to fill: ${r.days}`,`Closed: ${new Date(r.closedDate).toLocaleDateString()}`,`Recruiter: ${r.recruiter}`]:[];} }}},scales:{y:{grid:GG.grid,ticks:GG.ticks,title:{display:true,text:'Days to fill',color:'#6b7280',font:{size:10}}},x:{grid:{display:false},ticks:{...GG.ticks,maxRotation:40}}}}});
 
-  // Monthly benchmarks
   const now=new Date();
   const mLabels=[],mKeys=[];
   for(let i=5;i>=0;i--){const dt=new Date(now.getFullYear(),now.getMonth()-i,1);mLabels.push(['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]+' '+String(dt.getFullYear()).slice(2));mKeys.push(`${dt.getFullYear()}-${dt.getMonth()}`);}
@@ -515,7 +558,7 @@ function renderMonday(){
   mk('cOvC',{type:'bar',data:{labels:mLabels,datasets:[{label:'Closed',data:mC,backgroundColor:'#ec4899',borderRadius:4,borderSkipped:false},{label:'Paused',data:mP,backgroundColor:'#0e7490',borderRadius:4,borderSkipped:false},{label:'Opened',data:mO,backgroundColor:'#38bdf8',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},color:'#9ca3af',usePointStyle:true,pointStyle:'rect'}}},scales:{x:{grid:{display:false},ticks:GG.ticks},y:{grid:GG.grid,ticks:GG.ticks}}}});
 }
 
-/* ── NAV ── */
+/* ══ NAV ══ */
 function goPage(n,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
@@ -529,7 +572,3 @@ document.getElementById('pStatus').addEventListener('change',function(){PF.statu
 document.getElementById('pRoleType').addEventListener('change',function(){PF.roleType=this.value;renderPipeline();});
 
 setInterval(loadData,5*60*1000);
-loadData();
-</script>
-</body>
-</html>
