@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -67,8 +66,9 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
 .mc-val.warn{color:#f87171}.mc-val.ok{color:#4ade9a}
 .mc-sub{font-size:10px;color:#4b5563;margin-top:4px}
 .type-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.type-cards>div{display:flex;flex-direction:column;gap:8px}
 .tc{background:#1a2744;border:1px solid rgba(96,165,250,.2);border-radius:12px;padding:14px 16px}
-.tc-lbl{font-size:11px;color:#93c5fd;font-weight:500;margin-bottom:6px}
+.tc-lbl{font-size:11px;color:#93c5fd;font-weight:500;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase}
 .tc-val{font-size:26px;font-weight:700;color:#fff}
 .sec-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#4b5563;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .sec-lbl::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.05)}
@@ -463,13 +463,52 @@ function renderOverview(){
   document.getElementById('m-row').innerHTML=`
     <div class="mc gn"><div class="mc-lbl">Active roles now</div><div class="mc-val ok">${open.length}</div><div class="mc-sub">Currently open</div></div>
     <div class="mc tl"><div class="mc-lbl">Total opened · ${dateLabel}</div><div class="mc-val">${totalOpened}</div><div class="mc-sub">${open.length} active · ${Math.max(0,totalOpened-open.length)} closed/paused</div></div>
+    <div class="mc gn"><div class="mc-lbl">Total closed · ${dateLabel}</div><div class="mc-val ok">${closed.length}</div><div class="mc-sub">Avg ${avgC}d to fill</div></div>
     <div class="mc rd"><div class="mc-lbl">Roles over SLA</div><div class="mc-val warn">${overSla.length}</div><div class="mc-sub">${open.length?Math.round(overSla.length/open.length*100):0}% of active</div></div>
     <div class="mc am"><div class="mc-lbl">Avg days to close</div><div class="mc-val">${avgC}</div><div class="mc-sub">Target: 45 days</div></div>
-    <div class="mc bl"><div class="mc-lbl">Closed (≤30d)</div><div class="mc-val">${closed.filter(r=>r.days<=30).length}</div><div class="mc-sub">Fast closes</div></div>
     <div class="mc pu"><div class="mc-lbl">Paused / on hold</div><div class="mc-val">${paused.length}</div><div class="mc-sub">${rate}% closing rate</div></div>`;
 
   const types=['Full Time','Fractional','Advisor','Part Time'];
-  document.getElementById('t-cards').innerHTML=types.map(t=>`<div class="tc"><div class="tc-lbl">Active — ${t}</div><div class="tc-val">${open.filter(r=>r.roleType===t).length}</div></div>`).join('');
+  const dr=getDateRange();
+  document.getElementById('t-cards').innerHTML=types.map(t=>{
+    const activeCount=open.filter(r=>r.roleType===t).length;
+    const closedCount=RAW.filter(r=>{
+      if(!baseFilter(r)) return false;
+      if(r.roleType!==t) return false;
+      if(r.status!=='Closed') return false;
+      if(!dr.from&&!dr.to) return true;
+      if(r.closedDate&&inRange(r.closedDate,dr.from,dr.to)) return true;
+      return inRange(r.openDate,dr.from,dr.to);
+    }).length;
+    const totalOpened=RAW.filter(r=>{
+      if(!baseFilter(r)) return false;
+      if(r.roleType!==t) return false;
+      if(!dr.from&&!dr.to) return true;
+      return inRange(r.openDate,dr.from,dr.to);
+    }).length;
+    return`<div>
+      <div class="tc" style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+          <div class="tc-lbl">${t}</div>
+          <div style="font-size:10px;color:#4b5563;font-weight:500">Total opened</div>
+        </div>
+        <div style="display:flex;align-items:flex-end;justify-content:space-between">
+          <div>
+            <div style="font-size:10px;color:#93c5fd;margin-bottom:2px">Active now</div>
+            <div class="tc-val">${activeCount}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:10px;color:#6b7280;margin-bottom:2px">In period</div>
+            <div style="font-size:26px;font-weight:700;color:#9ca3af">${totalOpened}</div>
+          </div>
+        </div>
+      </div>
+      <div class="tc" style="background:#0d2a1f;border-color:rgba(74,222,154,.2)">
+        <div class="tc-lbl" style="color:#4ade9a">Closed</div>
+        <div class="tc-val" style="color:#4ade9a">${closedCount}</div>
+      </div>
+    </div>`;
+  }).join('');
 
   mk('cStatus',{type:'bar',data:{labels:['Open','Closed','Paused'],datasets:[{data:[open.length,closed.length,paused.length],backgroundColor:['#60a5fa','#4ade9a','#fbbf24'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:GG.grid,ticks:GG.ticks},x:{grid:{display:false},ticks:GG.ticks}}}});
 
