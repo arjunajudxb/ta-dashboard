@@ -215,7 +215,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
           <select class="fsel2" id="pRoleType" onchange="renderPipeline()">
             <option value="All">All role types</option>
             <option value="Full Time">Full Time</option>
-            <option value="Part Time">Part Time</option>
+            <option value="Freelancer">Freelancer</option>
             <option value="Advisor">Advisor</option>
             <option value="Fractional">Fractional</option>
           </select>
@@ -227,7 +227,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
         </div>
         <div class="card"><h3>Pipeline health table</h3>
           <div class="twrap"><table class="tbl">
-            <thead><tr><th>#</th><th>Position</th><th>Company</th><th>Recruiter</th><th>Stage</th><th>Days open</th><th>SLA</th><th>Over SLA</th><th>Status</th><th>HM</th><th>Role type</th><th>Budget AED</th><th>Category</th></tr></thead>
+            <thead><tr><th>#</th><th>Position</th><th>Company</th><th>Recruiter</th><th>Stage</th><th>Last update</th><th>Days open</th><th>SLA</th><th>Over SLA</th><th>Status</th><th>HM</th><th>Role type</th><th>Budget AED</th><th>Category</th></tr></thead>
             <tbody id="p-tbody"></tbody>
           </table></div>
         </div>
@@ -360,7 +360,7 @@ function parseRow(r){
   const rawRT=String(r.Role_Type||'').trim();
   const rtl=rawRT.toLowerCase();
   const roleType=rtl.includes('full')||rtl==='ft'?'Full Time':
-                 rtl.includes('part')||rtl==='pt'?'Part Time':
+                 rtl.includes('part')||rtl==='pt'||rtl.includes('freelanc')?'Freelancer':
                  rtl.includes('adv')?'Advisor':
                  rtl.includes('frac')?'Fractional':rawRT||'Full Time';
   const rawP=String(r.Priority||'').trim();
@@ -384,6 +384,20 @@ function parseRow(r){
     hm:String(r.Hiring_Manager||'').trim(),
     openDate:String(r.Open_Date||'').trim(),
     closedDate:String(r.Closed_Date||'').trim(),
+    lastUpdate:(function(){
+      // Column S = 19th column (index 18) of the sheet
+      const vals=Object.values(r);
+      let lu=vals.length>18&&vals[18]!=null?String(vals[18]).trim():'';
+      if(!lu) lu=String(r.Last_Update||r['Last Update']||r.Last_Updated||r['Last Updated']||r.LastUpdate||r.Latest_Update||r['Latest Update']||'').trim();
+      // If it's a date value, format it nicely
+      if(lu){
+        const d=new Date(lu);
+        if(!isNaN(d)&&(lu.includes('-')||lu.includes('/')||lu.includes('T'))){
+          lu=d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+        }
+      }
+      return lu;
+    })(),
   };
 }
 
@@ -468,7 +482,7 @@ function renderOverview(){
     <div class="mc am"><div class="mc-lbl">Avg days to close</div><div class="mc-val">${avgC}</div><div class="mc-sub">Target: 45 days</div></div>
     <div class="mc pu"><div class="mc-lbl">Paused / on hold</div><div class="mc-val">${paused.length}</div><div class="mc-sub">${rate}% closing rate</div></div>`;
 
-  const types=['Full Time','Fractional','Advisor','Part Time'];
+  const types=['Full Time','Fractional','Advisor','Freelancer'];
   const dr=getDateRange();
   document.getElementById('t-cards').innerHTML=types.map(t=>{
     const activeCount=open.filter(r=>r.roleType===t).length;
@@ -512,7 +526,7 @@ function renderOverview(){
 
   mk('cStatus',{type:'bar',data:{labels:['Open','Closed','Paused'],datasets:[{data:[open.length,closed.length,paused.length],backgroundColor:['#60a5fa','#4ade9a','#fbbf24'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:GG.grid,ticks:GG.ticks},x:{grid:{display:false},ticks:GG.ticks}}}});
 
-  const rtTypes=['Full Time','Part Time','Advisor','Fractional'];
+  const rtTypes=['Full Time','Freelancer','Advisor','Fractional'];
   const rtCounts=rtTypes.map(t=>d.filter(r=>r.roleType===t).length);
   mk('cRoleType',{type:'doughnut',
     data:{labels:rtTypes,datasets:[{data:rtCounts,backgroundColor:['#60a5fa','#4ade9a','#fbbf24','#a78bfa'],borderWidth:0,hoverOffset:6}]},
@@ -542,7 +556,7 @@ function renderPipeline(){
   const d=[...pd()].sort((a,b)=>b.daysOver-a.daysOver);
   document.getElementById('p-tbody').innerHTML=d.map((r,i)=>{
     const o=r.daysOver,cl=o>30?'dr':o>0?'da':'dg';
-    return`<tr><td style="color:#4b5563">${i+1}</td><td class="tdp">${r.pos}</td><td>${r.company}</td><td>${r.recruiter}</td><td style="color:#9ca3af;max-width:120px;overflow:hidden;text-overflow:ellipsis">${r.stage}</td><td style="font-weight:600">${r.days}</td><td style="color:#6b7280">${r.sla}</td><td><span class="dc ${cl}">${o}</span></td><td>${o>0?'<span class="bdg br">Yes</span>':'<span class="bdg bg2">No</span>'}</td><td>${r.hm}</td><td>${r.roleType}</td><td style="color:#9ca3af">${r.budget?r.budget.toLocaleString():'—'}</td><td style="font-size:11px;color:#6b7280">${r.cat}</td></tr>`;
+    return`<tr><td style="color:#4b5563">${i+1}</td><td class="tdp">${r.pos}</td><td>${r.company}</td><td>${r.recruiter}</td><td style="color:#9ca3af;max-width:120px;overflow:hidden;text-overflow:ellipsis">${r.stage}</td><td style="color:#9ca3af;max-width:160px;overflow:hidden;text-overflow:ellipsis;font-size:11px" title="${(r.lastUpdate||'').replace(/"/g,'&quot;')}">${r.lastUpdate||'—'}</td><td style="font-weight:600">${r.days}</td><td style="color:#6b7280">${r.sla}</td><td><span class="dc ${cl}">${o}</span></td><td>${o>0?'<span class="bdg br">Yes</span>':'<span class="bdg bg2">No</span>'}</td><td>${r.hm}</td><td>${r.roleType}</td><td style="color:#9ca3af">${r.budget?r.budget.toLocaleString():'—'}</td><td style="font-size:11px;color:#6b7280">${r.cat}</td></tr>`;
   }).join('');
 }
 
@@ -592,7 +606,7 @@ function renderMonday(){
 
   mk('cTtf',{type:'line',data:{labels:mLabels,datasets:[{label:'Avg TTF',data:mT,borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,0.08)',tension:.35,pointRadius:4,fill:true,spanGaps:true},{label:'SLA (45)',data:mLabels.map(()=>45),borderColor:'#f87171',borderDash:[6,4],pointRadius:0,borderWidth:1.5,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},color:'#9ca3af',usePointStyle:true}}},scales:{y:{grid:GG.grid,ticks:GG.ticks,min:0},x:{grid:{display:false},ticks:GG.ticks}}}});
   mk('cMove',{type:'line',data:{labels:mLabels,datasets:[{label:'Opened',data:mO,borderColor:'#a78bfa',tension:.35,pointRadius:4,fill:false},{label:'Closed',data:mC,borderColor:'#4ade9a',tension:.35,pointRadius:4,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},color:'#9ca3af',usePointStyle:true}}},scales:{y:{grid:GG.grid,ticks:GG.ticks},x:{grid:{display:false},ticks:GG.ticks}}}});
-  const rtypes=['Full Time','Part Time','Advisor','Fractional'];
+  const rtypes=['Full Time','Freelancer','Advisor','Fractional'];
   mk('cCRT',{type:'bar',data:{labels:rtypes,datasets:[{data:rtypes.map(t=>closed.filter(r=>r.roleType===t).length),backgroundColor:'#0d9488',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:GG.grid,ticks:GG.ticks},x:{grid:{display:false},ticks:GG.ticks}}}});
   mk('cOvC',{type:'bar',data:{labels:mLabels,datasets:[{label:'Closed',data:mC,backgroundColor:'#ec4899',borderRadius:4,borderSkipped:false},{label:'Paused',data:mP,backgroundColor:'#0e7490',borderRadius:4,borderSkipped:false},{label:'Opened',data:mO,backgroundColor:'#38bdf8',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},color:'#9ca3af',usePointStyle:true,pointStyle:'rect'}}},scales:{x:{grid:{display:false},ticks:GG.ticks},y:{grid:GG.grid,ticks:GG.ticks}}}});
 }
