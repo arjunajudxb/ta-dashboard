@@ -88,6 +88,15 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
 .tbl td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:#d1d5db;white-space:nowrap}
 .tbl tr:hover td{background:rgba(255,255,255,.02)}
 .tdp{font-weight:600;color:#e5e7eb;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+/* Resizable table */
+.tbl.rsz{table-layout:fixed;min-width:1450px}
+.tbl.rsz th{position:relative;overflow:hidden;text-overflow:ellipsis}
+.tbl.rsz td{overflow:hidden;text-overflow:ellipsis;max-width:none}
+.tbl.rsz .tdp{max-width:none}
+.th-rz{position:absolute;top:0;right:0;width:8px;height:100%;cursor:col-resize;user-select:none;touch-action:none}
+.th-rz::after{content:'';position:absolute;right:3px;top:20%;height:60%;width:1px;background:rgba(255,255,255,.12)}
+.th-rz:hover::after,.th-rz.on::after{width:2px;background:#4ade9a}
+.rz-hint{font-size:10px;color:#4b5563;margin-bottom:8px}
 .dc{display:inline-block;padding:2px 8px;border-radius:6px;font-weight:700;font-size:12px;min-width:36px;text-align:center}
 .dr{background:rgba(248,113,113,.25);color:#fca5a5}
 .da{background:rgba(251,191,36,.2);color:#fde68a}
@@ -226,8 +235,9 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
           </div>
         </div>
         <div class="card"><h3>Pipeline health table</h3>
-          <div class="twrap"><table class="tbl">
-            <thead><tr><th>#</th><th>Position</th><th>Company</th><th>Recruiter</th><th>Stage</th><th>Last update</th><th>Days open</th><th>SLA</th><th>Over SLA</th><th>Status</th><th>HM</th><th>Role type</th><th>Budget AED</th><th>Category</th></tr></thead>
+          <div class="rz-hint">↔ Drag the edge of a column header to resize · double-click the edge to fit content · hover a cell to see full text</div>
+          <div class="twrap"><table class="tbl rsz" id="p-table">
+            <thead><tr><th style="width:36px">#</th><th style="width:210px">Position</th><th style="width:80px">Company</th><th style="width:85px">Recruiter</th><th style="width:190px">Stage</th><th style="width:110px">Last update</th><th style="width:75px">Days open</th><th style="width:52px">SLA</th><th style="width:75px">Over SLA</th><th style="width:65px">Status</th><th style="width:90px">HM</th><th style="width:90px">Role type</th><th style="width:95px">Budget AED</th><th style="width:110px">Category</th></tr></thead>
             <tbody id="p-tbody"></tbody>
           </table></div>
         </div>
@@ -556,7 +566,8 @@ function renderPipeline(){
   const d=[...pd()].sort((a,b)=>b.daysOver-a.daysOver);
   document.getElementById('p-tbody').innerHTML=d.map((r,i)=>{
     const o=r.daysOver,cl=o>30?'dr':o>0?'da':'dg';
-    return`<tr><td style="color:#4b5563">${i+1}</td><td class="tdp">${r.pos}</td><td>${r.company}</td><td>${r.recruiter}</td><td style="color:#9ca3af;max-width:120px;overflow:hidden;text-overflow:ellipsis">${r.stage}</td><td style="color:#9ca3af;max-width:160px;overflow:hidden;text-overflow:ellipsis;font-size:11px" title="${(r.lastUpdate||'').replace(/"/g,'&quot;')}">${r.lastUpdate||'—'}</td><td style="font-weight:600">${r.days}</td><td style="color:#6b7280">${r.sla}</td><td><span class="dc ${cl}">${o}</span></td><td>${o>0?'<span class="bdg br">Yes</span>':'<span class="bdg bg2">No</span>'}</td><td>${r.hm}</td><td>${r.roleType}</td><td style="color:#9ca3af">${r.budget?r.budget.toLocaleString():'—'}</td><td style="font-size:11px;color:#6b7280">${r.cat}</td></tr>`;
+    const tt=s=>String(s||'').replace(/"/g,'&quot;');
+    return`<tr><td style="color:#4b5563">${i+1}</td><td class="tdp" title="${tt(r.pos)}">${r.pos}</td><td title="${tt(r.company)}">${r.company}</td><td>${r.recruiter}</td><td style="color:#9ca3af" title="${tt(r.stage)}">${r.stage}</td><td style="color:#9ca3af;font-size:11px" title="${tt(r.lastUpdate)}">${r.lastUpdate||'—'}</td><td style="font-weight:600">${r.days}</td><td style="color:#6b7280">${r.sla}</td><td><span class="dc ${cl}">${o}</span></td><td>${o>0?'<span class="bdg br">Yes</span>':'<span class="bdg bg2">No</span>'}</td><td title="${tt(r.hm)}">${r.hm}</td><td>${r.roleType}</td><td style="color:#9ca3af">${r.budget?r.budget.toLocaleString():'—'}</td><td style="font-size:11px;color:#6b7280" title="${tt(r.cat)}">${r.cat}</td></tr>`;
   }).join('');
 }
 
@@ -623,6 +634,47 @@ function goPage(n,el){
 function setOv(el,v){document.querySelectorAll('#ov-chips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');PF.ov=v;renderPipeline();}
 document.getElementById('pStatus').addEventListener('change',function(){PF.status=this.value;renderPipeline();});
 document.getElementById('pRoleType').addEventListener('change',function(){PF.roleType=this.value;renderPipeline();});
+
+/* ══ COLUMN RESIZE ══ */
+function initColResize(){
+  const table=document.getElementById('p-table');
+  if(!table||table.dataset.rz) return;
+  table.dataset.rz='1';
+  table.querySelectorAll('thead th').forEach((th,idx)=>{
+    const h=document.createElement('div');
+    h.className='th-rz';
+    th.appendChild(h);
+    let sx=0,sw=0;
+    h.addEventListener('pointerdown',e=>{
+      e.preventDefault();
+      sx=e.clientX;sw=th.offsetWidth;
+      h.classList.add('on');
+      h.setPointerCapture(e.pointerId);
+    });
+    h.addEventListener('pointermove',e=>{
+      if(!h.classList.contains('on')) return;
+      th.style.width=Math.max(40,sw+(e.clientX-sx))+'px';
+    });
+    h.addEventListener('pointerup',e=>{h.classList.remove('on');h.releasePointerCapture(e.pointerId);});
+    h.addEventListener('pointercancel',()=>h.classList.remove('on'));
+    // Double-click: auto-fit column to widest cell content
+    h.addEventListener('dblclick',()=>{
+      let max=0;
+      const probe=document.createElement('span');
+      probe.style.cssText='position:absolute;visibility:hidden;white-space:nowrap;font:12px Inter,system-ui';
+      document.body.appendChild(probe);
+      table.querySelectorAll('tbody tr').forEach(tr=>{
+        const td=tr.children[idx];
+        if(td){probe.textContent=td.textContent;max=Math.max(max,probe.offsetWidth);}
+      });
+      probe.textContent=th.textContent;
+      max=Math.max(max,probe.offsetWidth);
+      document.body.removeChild(probe);
+      th.style.width=Math.min(500,max+28)+'px';
+    });
+  });
+}
+initColResize();
 
 setInterval(loadData,5*60*1000);
 loadData();
