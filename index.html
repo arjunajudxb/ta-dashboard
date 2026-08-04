@@ -119,6 +119,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
 .th-rz::after{content:'';position:absolute;right:3px;top:20%;height:60%;width:1px;background:rgba(255,255,255,.12)}
 .th-rz:hover::after,.th-rz.on::after{width:2px;background:#4ade9a}
 .rz-hint{font-size:10px;color:#4b5563;margin-bottom:8px}
+.esc-btn{padding:4px 10px;border-radius:8px;border:1px solid rgba(248,113,113,.35);background:rgba(248,113,113,.08);color:#fca5a5;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.esc-btn:hover{background:rgba(248,113,113,.2);border-color:#f87171;color:#fff}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#111827;border:1px solid rgba(74,222,154,.35);color:#e5e7eb;padding:12px 18px;border-radius:12px;font-size:13px;z-index:200;opacity:0;transition:all .3s;box-shadow:0 8px 30px rgba(0,0,0,.5);max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast b{color:#4ade9a}
 .dc{display:inline-block;padding:2px 8px;border-radius:6px;font-weight:700;font-size:12px;min-width:36px;text-align:center}
 .dr{background:rgba(248,113,113,.25);color:#fca5a5}
 .da{background:rgba(251,191,36,.2);color:#fde68a}
@@ -261,7 +266,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
         <div class="card"><h3>Pipeline health table</h3>
           <div class="rz-hint">↔ Drag the edge of a column header to resize · double-click the edge to fit content · hover a cell to see full text</div>
           <div class="twrap"><table class="tbl rsz" id="p-table">
-            <thead><tr><th style="width:36px">#</th><th style="width:210px">Position</th><th style="width:80px">Company</th><th style="width:85px">Recruiter</th><th style="width:190px">Stage</th><th style="width:110px">Last update</th><th style="width:75px">Days open</th><th style="width:52px">SLA</th><th style="width:75px">Over SLA</th><th style="width:65px">Status</th><th style="width:90px">HM</th><th style="width:90px">Role type</th><th style="width:95px">Budget AED</th><th style="width:110px">Category</th></tr></thead>
+            <thead><tr><th style="width:36px">#</th><th style="width:210px">Position</th><th style="width:80px">Company</th><th style="width:85px">Recruiter</th><th style="width:190px">Stage</th><th style="width:110px">Last update</th><th style="width:75px">Days open</th><th style="width:52px">SLA</th><th style="width:75px">Over SLA</th><th style="width:65px">Status</th><th style="width:90px">HM</th><th style="width:90px">Role type</th><th style="width:95px">Budget AED</th><th style="width:110px">Category</th><th style="width:110px">Action</th></tr></thead>
             <tbody id="p-tbody"></tbody>
           </table></div>
         </div>
@@ -318,6 +323,8 @@ Chart.defaults.color='#6b7280';
 Chart.defaults.borderColor='rgba(255,255,255,0.05)';
 
 const API='https://script.google.com/macros/s/AKfycbzF2uHDmIjAuAk1TIlw90y5qfvvIpDLYZ4uWwTwMhbHChGzuw2ymhexTlrUMNR2YoVg/exec';
+/* Slack escalation — Arjun's Slack member ID (Slack profile → ⋮ → Copy member ID, looks like U0123ABCDEF) */
+const SLACK_USER_ID='U2XCN1WMD';
 const GG={grid:{color:'rgba(255,255,255,0.05)'},ticks:{font:{size:11},color:'#6b7280'}};
 let RAW=[], CI={};
 let GF={company:'All',recruiter:'All',dept:'All',date:'All',dateFrom:'',dateTo:'',hm:'All'};
@@ -612,7 +619,7 @@ function renderPipeline(){
   document.getElementById('p-tbody').innerHTML=d.map((r,i)=>{
     const o=r.daysOver,cl=o>30?'dr':o>0?'da':'dg';
     const tt=s=>String(s||'').replace(/"/g,'&quot;');
-    return`<tr><td style="color:#4b5563">${i+1}</td><td class="tdp" title="${tt(r.pos)}">${r.pos}</td><td title="${tt(r.company)}">${r.company}</td><td>${r.recruiter}</td><td style="color:#9ca3af" title="${tt(r.stage)}">${r.stage}</td><td style="color:#9ca3af;font-size:11px" title="${tt(r.lastUpdate)}">${r.lastUpdate||'—'}</td><td style="font-weight:600">${r.days}</td><td style="color:#6b7280">${r.sla}</td><td><span class="dc ${cl}">${o}</span></td><td>${o>0?'<span class="bdg br">Yes</span>':'<span class="bdg bg2">No</span>'}</td><td title="${tt(r.hm)}">${r.hm}</td><td>${r.roleType}</td><td style="color:#9ca3af">${r.budget?r.budget.toLocaleString():'—'}</td><td style="font-size:11px;color:#6b7280" title="${tt(r.cat)}">${r.cat}</td></tr>`;
+    return`<tr><td style="color:#4b5563">${i+1}</td><td class="tdp" title="${tt(r.pos)}">${r.pos}</td><td title="${tt(r.company)}">${r.company}</td><td>${r.recruiter}</td><td style="color:#9ca3af" title="${tt(r.stage)}">${r.stage}</td><td style="color:#9ca3af;font-size:11px" title="${tt(r.lastUpdate)}">${r.lastUpdate||'—'}</td><td style="font-weight:600">${r.days}</td><td style="color:#6b7280">${r.sla}</td><td><span class="dc ${cl}">${o}</span></td><td>${o>0?'<span class="bdg br">Yes</span>':'<span class="bdg bg2">No</span>'}</td><td title="${tt(r.hm)}">${r.hm}</td><td>${r.roleType}</td><td style="color:#9ca3af">${r.budget?r.budget.toLocaleString():'—'}</td><td style="font-size:11px;color:#6b7280" title="${tt(r.cat)}">${r.cat}</td><td>${o>0?`<button class="esc-btn" onclick="escalate('${tt(r.pos).replace(/'/g,"\\'")}',${r.days},${o})">⚡ Escalate</button>`:''}</td></tr>`;
   }).join('');
 }
 
@@ -773,6 +780,33 @@ function fallbackCopy(text,done){
   document.body.appendChild(ta);ta.select();
   try{document.execCommand('copy');done();}catch(e){prompt('Copy this link:',text);}
   document.body.removeChild(ta);
+}
+
+/* ══ SLACK ESCALATION ══ */
+function escalate(pos,days,over){
+  const msg=`Hey Arjun, please take a look into the "${pos}" role as a priority — it has been open for ${days} days (${over} days over SLA). Let's discuss the challenges.`;
+  const openSlack=()=>{
+    showToast('<b>Message copied!</b> Slack is opening — just paste (Ctrl/Cmd+V) and send.');
+    if(SLACK_USER_ID&&SLACK_USER_ID.indexOf('PASTE_')===-1){
+      window.open('https://slack.com/app_redirect?channel='+encodeURIComponent(SLACK_USER_ID),'_blank');
+    }else{
+      window.open('https://slack.com','_blank');
+    }
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(msg).then(openSlack).catch(()=>{fallbackCopy(msg,openSlack);});
+  }else{
+    fallbackCopy(msg,openSlack);
+  }
+}
+let toastTimer=null;
+function showToast(html){
+  let t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t);}
+  t.innerHTML=html;
+  requestAnimationFrame(()=>t.classList.add('show'));
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),4500);
 }
 
 initColResize();
