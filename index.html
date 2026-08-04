@@ -162,11 +162,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
       <span class="nav-label">Pipeline Health</span>
       <span class="nav-badge" id="sla-badge">—</span>
     </div>
-    <div class="nav-item" onclick="goPage('capacity',this)">
+    <div class="nav-item" id="nav-capacity" onclick="goPage('capacity',this)">
       <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><line x1="16" y1="11" x2="22" y2="11"/><line x1="19" y1="8" x2="19" y2="14"/></svg></div>
       <span class="nav-label">Team Capacity</span>
     </div>
-    <div class="nav-item" onclick="goPage('monday',this)">
+    <div class="nav-item" id="nav-monday" onclick="goPage('monday',this)">
       <div class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
       <span class="nav-label">Monday Review</span>
     </div>
@@ -725,6 +725,9 @@ function applyLockMode(){
   if(!LOCKED) return;
   document.querySelector('.sb-filters').style.display='none';
   document.getElementById('shareBtn').style.display='none';
+  // HMs only need Top Level + Pipeline Health
+  document.getElementById('nav-capacity').style.display='none';
+  document.getElementById('nav-monday').style.display='none';
   const parts=[];
   if(GF.hm!=='All') parts.push('Hiring manager: '+GF.hm);
   if(GF.dept!=='All') parts.push('Department: '+GF.dept);
