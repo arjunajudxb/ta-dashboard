@@ -49,6 +49,28 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
 .live-lbl{font-size:11px;color:#4ade9a;font-weight:600;letter-spacing:.06em}
 .ref-btn{padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#9ca3af;font-size:11px;cursor:pointer;font-family:inherit}
 .ref-btn:hover{border-color:#4ade9a;color:#4ade9a}
+/* Share modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:none;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#111827;border:1px solid rgba(255,255,255,.1);border-radius:14px;width:560px;max-width:92vw;max-height:80vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-h{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between}
+.modal-h h2{font-size:14px;font-weight:600;color:#fff}
+.modal-x{cursor:pointer;color:#6b7280;font-size:18px;line-height:1;padding:4px}
+.modal-x:hover{color:#fff}
+.modal-b{padding:14px 20px;overflow-y:auto}
+.sh-note{font-size:11px;color:#6b7280;margin-bottom:12px;line-height:1.5}
+.sh-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.sh-row:last-child{border-bottom:none}
+.sh-name{font-size:13px;font-weight:600;color:#e5e7eb;min-width:110px}
+.sh-cnt{font-size:11px;color:#6b7280;min-width:60px}
+.sh-copy{margin-left:auto;padding:5px 12px;border-radius:8px;border:1px solid rgba(74,222,154,.3);background:transparent;color:#4ade9a;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.sh-copy:hover{background:rgba(74,222,154,.1)}
+.sh-copy.ok{background:#4ade9a;color:#0a0e1a;border-color:#4ade9a}
+.sh-opts{display:flex;gap:14px;margin-bottom:12px;font-size:12px;color:#9ca3af}
+.sh-opts label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.lock-banner{background:rgba(74,222,154,.08);border:1px solid rgba(74,222,154,.2);border-radius:10px;padding:8px 14px;margin-bottom:16px;font-size:12px;color:#4ade9a;display:none}
+#p-table.hide-budget th:nth-child(13),#p-table.hide-budget td:nth-child(13),
+#p-table.hide-budget th:nth-child(14),#p-table.hide-budget td:nth-child(14){display:none}
 .content{padding:24px 28px;flex:1}
 .page{display:none}.page.active{display:block}
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;gap:12px;color:#6b7280}
@@ -193,11 +215,13 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
       <div class="tb-meta">ITCAN & MoonTech · <span id="tb-time">Loading...</span></div>
     </div>
     <div class="tb-right">
+      <button class="ref-btn" id="shareBtn" onclick="openShare()">🔗 Share</button>
       <button class="ref-btn" onclick="loadData()">↻ Refresh</button>
       <div class="live-dot"></div><div class="live-lbl">LIVE</div>
     </div>
   </div>
   <div class="content">
+    <div class="lock-banner" id="lockBanner"></div>
     <div id="g-loading" class="loading"><div class="spinner"></div><div>Fetching live data...</div></div>
     <div id="g-error" style="display:none"></div>
     <div id="g-pages" style="display:none">
@@ -279,14 +303,33 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
   </div>
 </div>
 
+<div class="modal-bg" id="shareModal" onclick="if(event.target===this)closeShare()">
+  <div class="modal">
+    <div class="modal-h"><h2>🔗 Share filtered links</h2><div class="modal-x" onclick="closeShare()">✕</div></div>
+    <div class="modal-b">
+      <div class="sh-note">Each link carries a <b>secret access key</b>. The server returns only that hiring manager's roles — other roles and budgets are never sent to their browser. Keys are managed in your Apps Script.</div>
+      <div id="shareList"><div class="sh-note">Loading keys…</div></div>
+    </div>
+  </div>
+</div>
+
 <script>
 Chart.defaults.color='#6b7280';
 Chart.defaults.borderColor='rgba(255,255,255,0.05)';
 
-const API='https://script.google.com/macros/s/AKfycbxzs7qdrJK93WwHBKnQ2RN8aWcr9-EbAmSIYitoEiUQAiMu2sSRw6hIDhrWsTDgUz3X6A/exec';
+const API='https://script.google.com/macros/s/AKfycbzF2uHDmIjAuAk1TIlw90y5qfvvIpDLYZ4uWwTwMhbHChGzuw2ymhexTlrUMNR2YoVg/exec';
 const GG={grid:{color:'rgba(255,255,255,0.05)'},ticks:{font:{size:11},color:'#6b7280'}};
 let RAW=[], CI={};
-let GF={company:'All',recruiter:'All',dept:'All',date:'All',dateFrom:'',dateTo:''};
+let GF={company:'All',recruiter:'All',dept:'All',date:'All',dateFrom:'',dateTo:'',hm:'All'};
+/* ══ URL PARAMS / LOCK MODE ══ */
+const URLP=new URLSearchParams(location.search);
+const KEY=(URLP.get('key')||'').trim();
+const LOCKED=URLP.get('lock')==='1';
+const HIDE_BUDGET=URLP.get('hidebudget')==='1';
+if(URLP.get('hm')) GF.hm=URLP.get('hm');
+if(URLP.get('dept')) GF.dept=URLP.get('dept');
+if(URLP.get('company')) GF.company=URLP.get('company');
+if(URLP.get('recruiter')) GF.recruiter=URLP.get('recruiter');
 let PF={status:'Open',roleType:'All',ov:'All'};
 
 /* ══ HELPERS ══ */
@@ -328,6 +371,7 @@ function baseFilter(r){
   if(GF.company!=='All'&&r.company!==GF.company) return false;
   if(GF.recruiter!=='All'&&r.recruiter!==GF.recruiter) return false;
   if(GF.dept!=='All'&&r.dept!==GF.dept) return false;
+  if(GF.hm!=='All'&&!String(r.hm||'').toLowerCase().includes(GF.hm.toLowerCase())) return false;
   return true;
 }
 
@@ -415,10 +459,11 @@ function parseRow(r){
 async function loadData(){
   show('g-loading');hide('g-error');hide('g-pages');
   try{
-    const res=await fetch(API);
+    const res=await fetch(API+(KEY?'?key='+encodeURIComponent(KEY):''));
     if(!res.ok) throw new Error('HTTP '+res.status);
     const json=await res.json();
-    if(!Array.isArray(json)||!json.length) throw new Error('No data returned');
+    if(json&&json.error) throw new Error(json.error);
+    if(!Array.isArray(json)||!json.length) throw new Error(KEY?'No roles found for your access key yet.':'No data returned');
     RAW=json.map(parseRow).filter(r=>r.pos);
     const recs=[...new Set(RAW.map(r=>r.recruiter).filter(r=>r&&r!=='Other'))].sort();
     setOpts('gRecruiter','All recruiters',recs);
@@ -674,6 +719,59 @@ function initColResize(){
     });
   });
 }
+/* ══ LOCK MODE ══ */
+function applyLockMode(){
+  if(HIDE_BUDGET) document.getElementById('p-table').classList.add('hide-budget');
+  if(!LOCKED) return;
+  document.querySelector('.sb-filters').style.display='none';
+  document.getElementById('shareBtn').style.display='none';
+  const parts=[];
+  if(GF.hm!=='All') parts.push('Hiring manager: '+GF.hm);
+  if(GF.dept!=='All') parts.push('Department: '+GF.dept);
+  if(GF.company!=='All') parts.push('Company: '+GF.company);
+  if(GF.recruiter!=='All') parts.push('Recruiter: '+GF.recruiter);
+  const b=document.getElementById('lockBanner');
+  b.textContent='🔒 '+(parts.length?'Filtered view — '+parts.join(' · '):'Showing your positions only');
+  b.style.display='block';
+}
+applyLockMode();
+
+/* ══ SHARE MODAL ══ */
+function openShare(){document.getElementById('shareModal').classList.add('open');renderShare();}
+function closeShare(){document.getElementById('shareModal').classList.remove('open');}
+function shareBase(){return location.origin==='null'||location.protocol==='file:'?location.pathname:location.origin+location.pathname;}
+async function renderShare(){
+  const el=document.getElementById('shareList');
+  if(!KEY){el.innerHTML='<div class="sh-note">⚠️ Open the dashboard with your <b>admin key</b> (?key=YOUR-ADMIN-KEY) to generate share links.</div>';return;}
+  el.innerHTML='<div class="sh-note">Loading keys…</div>';
+  try{
+    const res=await fetch(API+'?key='+encodeURIComponent(KEY)+'&list=1');
+    const list=await res.json();
+    if(list&&list.error) throw new Error(list.error);
+    if(!Array.isArray(list)) throw new Error('Share links require the admin key.');
+    const base=shareBase();
+    el.innerHTML=list.map(x=>{
+      const openCnt=RAW.filter(r=>String(r.hm||'').toLowerCase().includes(x.hm.toLowerCase())&&r.status==='Open').length;
+      const link=base+'?key='+encodeURIComponent(x.key)+'&lock=1&hidebudget=1';
+      return`<div class="sh-row"><div class="sh-name">${x.hm}</div><div class="sh-cnt">${openCnt} open</div><button class="sh-copy" onclick="copyLink(this,'${link.replace(/'/g,"\\'")}')">Copy link</button></div>`;
+    }).join('')||'<div class="sh-note">No HM keys configured in the Apps Script yet.</div>';
+  }catch(e){
+    el.innerHTML=`<div class="sh-note">⚠️ ${e.message}</div>`;
+  }
+}
+function copyLink(btn,link){
+  const done=()=>{btn.textContent='✓ Copied';btn.classList.add('ok');setTimeout(()=>{btn.textContent='Copy link';btn.classList.remove('ok');},1600);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(link).then(done).catch(()=>fallbackCopy(link,done));}
+  else fallbackCopy(link,done);
+}
+function fallbackCopy(text,done){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.cssText='position:fixed;opacity:0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');done();}catch(e){prompt('Copy this link:',text);}
+  document.body.removeChild(ta);
+}
+
 initColResize();
 
 setInterval(loadData,5*60*1000);
