@@ -221,7 +221,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
     </div>
     <div class="tb-right">
       <button class="ref-btn" id="shareBtn" onclick="openShare()">🔗 Share</button>
-      <button class="ref-btn" onclick="loadData()">↻ Refresh</button>
+      <button class="ref-btn" onclick="loadData(RAW.length>0)">↻ Refresh</button>
       <div class="live-dot"></div><div class="live-lbl">LIVE</div>
     </div>
   </div>
@@ -463,8 +463,8 @@ function parseRow(r){
 }
 
 /* ══ LOAD ══ */
-async function loadData(){
-  show('g-loading');hide('g-error');hide('g-pages');
+async function loadData(silent){
+  if(!silent){show('g-loading');hide('g-error');hide('g-pages');}
   try{
     const res=await fetch(API+(KEY?'?key='+encodeURIComponent(KEY):''));
     if(!res.ok) throw new Error('HTTP '+res.status);
@@ -479,7 +479,9 @@ async function loadData(){
     hide('g-loading');show('g-pages');
     document.getElementById('tb-time').textContent='Live · '+new Date().toLocaleTimeString();
     renderAll();
+    if(silent) showToast('<b>Updated</b> — data refreshed.');
   }catch(e){
+    if(silent){showToast('⚠️ Background refresh failed — showing last data.');return;}
     hide('g-loading');show('g-error');
     document.getElementById('g-error').innerHTML=`<div class="err-box">❌ ${e.message}</div>`;
   }
@@ -785,19 +787,28 @@ function fallbackCopy(text,done){
 /* ══ SLACK ESCALATION ══ */
 function escalate(pos,days,over){
   const msg=`Hey Arjun, please take a look into the "${pos}" role as a priority — it has been open for ${days} days (${over} days over SLA). Let's discuss the challenges.`;
-  const openSlack=()=>{
-    showToast('<b>Message copied!</b> Slack is opening — just paste (Ctrl/Cmd+V) and send.');
-    if(SLACK_USER_ID&&SLACK_USER_ID.indexOf('PASTE_')===-1){
-      window.open('https://slack.com/app_redirect?channel='+encodeURIComponent(SLACK_USER_ID),'_blank');
-    }else{
-      window.open('https://slack.com','_blank');
-    }
-  };
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(msg).then(openSlack).catch(()=>{fallbackCopy(msg,openSlack);});
-  }else{
-    fallbackCopy(msg,openSlack);
+  // Best-effort auto copy (Slack cannot pre-fill messages, so paste is required)
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(msg).catch(()=>{});}
+  let m=document.getElementById('escModal');
+  if(!m){
+    m=document.createElement('div');
+    m.id='escModal';m.className='modal-bg';
+    m.onclick=e=>{if(e.target===m)m.classList.remove('open');};
+    m.innerHTML=`<div class="modal" style="width:520px">
+      <div class="modal-h"><h2>⚡ Escalate to Arjun</h2><div class="modal-x" onclick="document.getElementById('escModal').classList.remove('open')">✕</div></div>
+      <div class="modal-b">
+        <div class="sh-note">Step 1 — copy the message below (already copied for you).<br>Step 2 — open Slack and <b>paste it (Ctrl/Cmd + V)</b> into the chat with Arjun, then send.<br><span style="color:#4b5563">Slack does not allow apps to pre-type messages, so pasting is needed.</span></div>
+        <textarea id="escMsg" readonly style="width:100%;height:110px;background:#0d1120;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#e5e7eb;padding:10px 12px;font-family:inherit;font-size:12.5px;line-height:1.5;resize:none;margin-bottom:12px"></textarea>
+        <div style="display:flex;gap:10px">
+          <button class="sh-copy" style="flex:1;padding:10px" onclick="copyLink(this,document.getElementById('escMsg').value)">📋 Copy message</button>
+          <button class="sh-copy" style="flex:1;padding:10px;border-color:rgba(96,165,250,.4);color:#60a5fa" onclick="window.open('https://slack.com/app_redirect?channel=${SLACK_USER_ID}','_blank')">💬 Open Slack chat</button>
+        </div>
+      </div>
+    </div>`;
+    document.body.appendChild(m);
   }
+  document.getElementById('escMsg').value=msg;
+  m.classList.add('open');
 }
 let toastTimer=null;
 function showToast(html){
@@ -811,7 +822,7 @@ function showToast(html){
 
 initColResize();
 
-setInterval(loadData,5*60*1000);
+setInterval(()=>loadData(true),5*60*1000);
 loadData();
 </script>
 </body>
