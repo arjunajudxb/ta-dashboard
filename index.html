@@ -131,6 +131,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
 .bdg{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
 .br{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.2)}
 .bg2{background:rgba(74,222,154,.12);color:#4ade9a;border:1px solid rgba(74,222,154,.18)}
+.da2{background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.22)}
 .rec-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
 .rc{background:#111827;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px 20px}
 .rav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-bottom:12px}
@@ -221,7 +222,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
     </div>
     <div class="tb-right">
       <button class="ref-btn" id="shareBtn" onclick="openShare()">🔗 Share</button>
-      <button class="ref-btn" onclick="loadData(RAW.length>0)">↻ Refresh</button>
+      <button class="ref-btn" onclick="loadData()">↻ Refresh</button>
       <div class="live-dot"></div><div class="live-lbl">LIVE</div>
     </div>
   </div>
@@ -257,6 +258,9 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
             <option value="Advisor">Advisor</option>
             <option value="Fractional">Fractional</option>
           </select>
+          <select class="fsel2" id="pCat" onchange="renderPipeline()">
+            <option value="All">All budget categories</option>
+          </select>
           <div class="chips" id="ov-chips">
             <span class="chip active" onclick="setOv(this,'All')">All</span>
             <span class="chip" onclick="setOv(this,'Yes')">Over SLA only</span>
@@ -266,7 +270,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e8eaf0;f
         <div class="card"><h3>Pipeline health table</h3>
           <div class="rz-hint">↔ Drag the edge of a column header to resize · double-click the edge to fit content · hover a cell to see full text</div>
           <div class="twrap"><table class="tbl rsz" id="p-table">
-            <thead><tr><th style="width:36px">#</th><th style="width:210px">Position</th><th style="width:80px">Company</th><th style="width:85px">Recruiter</th><th style="width:190px">Stage</th><th style="width:110px">Last update</th><th style="width:75px">Days open</th><th style="width:52px">SLA</th><th style="width:75px">Over SLA</th><th style="width:65px">Status</th><th style="width:90px">HM</th><th style="width:90px">Role type</th><th style="width:95px">Budget AED</th><th style="width:110px">Category</th><th style="width:110px">Action</th></tr></thead>
+            <thead><tr><th style="width:36px">#</th><th style="width:210px">Position</th><th style="width:80px">Company</th><th style="width:85px">Recruiter</th><th style="width:190px">Stage</th><th style="width:110px">Last update</th><th style="width:75px">Days open</th><th style="width:52px">SLA</th><th style="width:75px">Over SLA</th><th style="width:200px">Weekly update</th><th style="width:90px">HM</th><th style="width:90px">Role type</th><th style="width:95px">Budget AED</th><th style="width:110px">Category</th><th style="width:110px">Action</th></tr></thead>
             <tbody id="p-tbody"></tbody>
           </table></div>
         </div>
@@ -324,7 +328,7 @@ Chart.defaults.borderColor='rgba(255,255,255,0.05)';
 
 const API='https://script.google.com/macros/s/AKfycbzF2uHDmIjAuAk1TIlw90y5qfvvIpDLYZ4uWwTwMhbHChGzuw2ymhexTlrUMNR2YoVg/exec';
 /* Slack escalation — Arjun's Slack member ID (Slack profile → ⋮ → Copy member ID, looks like U0123ABCDEF) */
-const SLACK_USER_ID='U2XCN1WMD';
+const SLACK_USER_ID='PASTE_ARJUN_SLACK_MEMBER_ID';
 const GG={grid:{color:'rgba(255,255,255,0.05)'},ticks:{font:{size:11},color:'#6b7280'}};
 let RAW=[], CI={};
 let GF={company:'All',recruiter:'All',dept:'All',date:'All',dateFrom:'',dateTo:'',hm:'All'};
@@ -337,7 +341,7 @@ if(URLP.get('hm')) GF.hm=URLP.get('hm');
 if(URLP.get('dept')) GF.dept=URLP.get('dept');
 if(URLP.get('company')) GF.company=URLP.get('company');
 if(URLP.get('recruiter')) GF.recruiter=URLP.get('recruiter');
-let PF={status:'Open',roleType:'All',ov:'All'};
+let PF={status:'Open',roleType:'All',ov:'All',cat:'All'};
 
 /* ══ HELPERS ══ */
 function show(id){document.getElementById(id).style.display='';}
@@ -402,6 +406,7 @@ function pd(){
   return gd().filter(r=>{
     if(PF.status!=='All'&&r.status!==PF.status) return false;
     if(PF.roleType!=='All'&&r.roleType!==PF.roleType) return false;
+    if(PF.cat!=='All'&&r.cat!==PF.cat) return false;
     if(PF.ov==='Yes'&&r.daysOver===0) return false;
     if(PF.ov==='No'&&r.daysOver>0) return false;
     return true;
@@ -410,12 +415,18 @@ function pd(){
 
 /* ══ PARSE ROW ══ */
 function parseRow(r){
+  // Flexible header lookup: trims + lowercases keys so 'STAGE', ' Role Status', etc. all match
+  const _keys={};
+  for(const k in r){_keys[k.trim().toLowerCase()]=k;}
+  const F=(name)=>{const kk=_keys[name.trim().toLowerCase()];return kk!=null?r[kk]:'';};
   const rec=String(r.Recruiter||'');
   const rl=rec.toLowerCase();
   const recruiter=rl.includes('jabaseh')||rl.includes('nour j')?'Nour J':
                   rl.includes('mokhtar')||rl.includes('nour m')?'Nour M':
                   rl.includes('aju')?'Aju':rec||'Other';
-  const sl=String(r.Status||'').toLowerCase();
+  let statusRaw=F('Status');
+  if(statusRaw==null||String(statusRaw).trim()===''){statusRaw=F('Role Status');}
+  const sl=String(statusRaw||'').toLowerCase();
   const status=sl.includes('open')?'Open':sl.includes('closed')?'Closed':
                (sl.includes('pause')||sl.includes('cancel')||sl.includes('direction'))?'Paused':'Other';
   const rawRT=String(r.Role_Type||'').trim();
@@ -439,18 +450,16 @@ function parseRow(r){
     posType:String(r.Position_Type||'').trim(),
     days,sla,
     daysOver:parseInt(r.Days_Over_SLA)||Math.max(0,days-sla),
-    stage:String(r.Stage||'').trim(),
+    stage:String(F('STAGE')||'').trim(),
+    roleStatus:String(F('Role Status')||'').trim(),
+    weeklyUpdate:String(F('Weekly update')||'').trim(),
     budget:parseInt(String(r.Budget_AED||'').replace(/[^0-9]/g,''))||0,
     cat:String(r['Budget category']||r.Budget_category||'').trim(),
     hm:String(r.Hiring_Manager||'').trim(),
     openDate:String(r.Open_Date||'').trim(),
     closedDate:String(r.Closed_Date||'').trim(),
     lastUpdate:(function(){
-      // Column S = 19th column (index 18) of the sheet
-      const vals=Object.values(r);
-      let lu=vals.length>18&&vals[18]!=null?String(vals[18]).trim():'';
-      if(!lu) lu=String(r.Last_Update||r['Last Update']||r.Last_Updated||r['Last Updated']||r.LastUpdate||r.Latest_Update||r['Latest Update']||'').trim();
-      // If it's a date value, format it nicely
+      let lu=String(F('Last update')||'').trim();
       if(lu){
         const d=new Date(lu);
         if(!isNaN(d)&&(lu.includes('-')||lu.includes('/')||lu.includes('T'))){
@@ -463,8 +472,8 @@ function parseRow(r){
 }
 
 /* ══ LOAD ══ */
-async function loadData(silent){
-  if(!silent){show('g-loading');hide('g-error');hide('g-pages');}
+async function loadData(){
+  show('g-loading');hide('g-error');hide('g-pages');
   try{
     const res=await fetch(API+(KEY?'?key='+encodeURIComponent(KEY):''));
     if(!res.ok) throw new Error('HTTP '+res.status);
@@ -476,12 +485,12 @@ async function loadData(silent){
     setOpts('gRecruiter','All recruiters',recs);
     const depts=[...new Set(RAW.map(r=>r.dept).filter(d=>d))].sort();
     setOpts('gDept','All departments',depts);
+    const cats=[...new Set(RAW.map(r=>r.cat).filter(c=>c))].sort();
+    setOpts('pCat','All budget categories',cats);
     hide('g-loading');show('g-pages');
     document.getElementById('tb-time').textContent='Live · '+new Date().toLocaleTimeString();
     renderAll();
-    if(silent) showToast('<b>Updated</b> — data refreshed.');
   }catch(e){
-    if(silent){showToast('⚠️ Background refresh failed — showing last data.');return;}
     hide('g-loading');show('g-error');
     document.getElementById('g-error').innerHTML=`<div class="err-box">❌ ${e.message}</div>`;
   }
@@ -621,7 +630,7 @@ function renderPipeline(){
   document.getElementById('p-tbody').innerHTML=d.map((r,i)=>{
     const o=r.daysOver,cl=o>30?'dr':o>0?'da':'dg';
     const tt=s=>String(s||'').replace(/"/g,'&quot;');
-    return`<tr><td style="color:#4b5563">${i+1}</td><td class="tdp" title="${tt(r.pos)}">${r.pos}</td><td title="${tt(r.company)}">${r.company}</td><td>${r.recruiter}</td><td style="color:#9ca3af" title="${tt(r.stage)}">${r.stage}</td><td style="color:#9ca3af;font-size:11px" title="${tt(r.lastUpdate)}">${r.lastUpdate||'—'}</td><td style="font-weight:600">${r.days}</td><td style="color:#6b7280">${r.sla}</td><td><span class="dc ${cl}">${o}</span></td><td>${o>0?'<span class="bdg br">Yes</span>':'<span class="bdg bg2">No</span>'}</td><td title="${tt(r.hm)}">${r.hm}</td><td>${r.roleType}</td><td style="color:#9ca3af">${r.budget?r.budget.toLocaleString():'—'}</td><td style="font-size:11px;color:#6b7280" title="${tt(r.cat)}">${r.cat}</td><td>${o>0?`<button class="esc-btn" onclick="escalate('${tt(r.pos).replace(/'/g,"\\'")}',${r.days},${o})">⚡ Escalate</button>`:''}</td></tr>`;
+    return`<tr><td style="color:#4b5563">${i+1}</td><td class="tdp" title="${tt(r.pos)}">${r.pos}</td><td title="${tt(r.company)}">${r.company}</td><td>${r.recruiter}</td><td style="color:#9ca3af" title="${tt(r.stage)}">${r.stage}</td><td style="color:#9ca3af;font-size:11px" title="${tt(r.lastUpdate)}">${r.lastUpdate||'—'}</td><td style="font-weight:600">${r.days}</td><td style="color:#6b7280">${r.sla}</td><td><span class="dc ${cl}">${o}</span></td><td style="color:#cbd5e1;font-size:11px;line-height:1.4" title="${tt(r.weeklyUpdate)}">${r.weeklyUpdate||'—'}</td><td title="${tt(r.hm)}">${r.hm}</td><td>${r.roleType}</td><td style="color:#9ca3af">${r.budget?r.budget.toLocaleString():'—'}</td><td style="font-size:11px;color:#6b7280" title="${tt(r.cat)}">${r.cat}</td><td>${o>0?`<button class="esc-btn" onclick="escalate('${tt(r.pos).replace(/'/g,"\\'")}',${r.days},${o})">⚡ Escalate</button>`:''}</td></tr>`;
   }).join('');
 }
 
@@ -688,6 +697,7 @@ function goPage(n,el){
 function setOv(el,v){document.querySelectorAll('#ov-chips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');PF.ov=v;renderPipeline();}
 document.getElementById('pStatus').addEventListener('change',function(){PF.status=this.value;renderPipeline();});
 document.getElementById('pRoleType').addEventListener('change',function(){PF.roleType=this.value;renderPipeline();});
+document.getElementById('pCat').addEventListener('change',function(){PF.cat=this.value;renderPipeline();});
 
 /* ══ COLUMN RESIZE ══ */
 function initColResize(){
@@ -787,28 +797,19 @@ function fallbackCopy(text,done){
 /* ══ SLACK ESCALATION ══ */
 function escalate(pos,days,over){
   const msg=`Hey Arjun, please take a look into the "${pos}" role as a priority — it has been open for ${days} days (${over} days over SLA). Let's discuss the challenges.`;
-  // Best-effort auto copy (Slack cannot pre-fill messages, so paste is required)
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(msg).catch(()=>{});}
-  let m=document.getElementById('escModal');
-  if(!m){
-    m=document.createElement('div');
-    m.id='escModal';m.className='modal-bg';
-    m.onclick=e=>{if(e.target===m)m.classList.remove('open');};
-    m.innerHTML=`<div class="modal" style="width:520px">
-      <div class="modal-h"><h2>⚡ Escalate to Arjun</h2><div class="modal-x" onclick="document.getElementById('escModal').classList.remove('open')">✕</div></div>
-      <div class="modal-b">
-        <div class="sh-note">Step 1 — copy the message below (already copied for you).<br>Step 2 — open Slack and <b>paste it (Ctrl/Cmd + V)</b> into the chat with Arjun, then send.<br><span style="color:#4b5563">Slack does not allow apps to pre-type messages, so pasting is needed.</span></div>
-        <textarea id="escMsg" readonly style="width:100%;height:110px;background:#0d1120;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#e5e7eb;padding:10px 12px;font-family:inherit;font-size:12.5px;line-height:1.5;resize:none;margin-bottom:12px"></textarea>
-        <div style="display:flex;gap:10px">
-          <button class="sh-copy" style="flex:1;padding:10px" onclick="copyLink(this,document.getElementById('escMsg').value)">📋 Copy message</button>
-          <button class="sh-copy" style="flex:1;padding:10px;border-color:rgba(96,165,250,.4);color:#60a5fa" onclick="window.open('https://slack.com/app_redirect?channel=${SLACK_USER_ID}','_blank')">💬 Open Slack chat</button>
-        </div>
-      </div>
-    </div>`;
-    document.body.appendChild(m);
+  const openSlack=()=>{
+    showToast('<b>Message copied!</b> Slack is opening — just paste (Ctrl/Cmd+V) and send.');
+    if(SLACK_USER_ID&&SLACK_USER_ID.indexOf('PASTE_')===-1){
+      window.open('https://slack.com/app_redirect?channel='+encodeURIComponent(SLACK_USER_ID),'_blank');
+    }else{
+      window.open('https://slack.com','_blank');
+    }
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(msg).then(openSlack).catch(()=>{fallbackCopy(msg,openSlack);});
+  }else{
+    fallbackCopy(msg,openSlack);
   }
-  document.getElementById('escMsg').value=msg;
-  m.classList.add('open');
 }
 let toastTimer=null;
 function showToast(html){
@@ -822,7 +823,7 @@ function showToast(html){
 
 initColResize();
 
-setInterval(()=>loadData(true),5*60*1000);
+setInterval(loadData,5*60*1000);
 loadData();
 </script>
 </body>
